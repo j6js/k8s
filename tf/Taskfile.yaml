@@ -1,0 +1,16 @@
+version: "3"
+
+tasks:
+  test:
+    desc: "Validates Terraform Config"
+    cmds:
+      - terragrunt validate
+  bootstrap:
+    desc: "Inits Terragrunt/Terrafrom and Deploys/Applies Terraform (technically first run only, but will still work otherwise)"
+    cmds:
+      - terragrunt init
+      - task: deploy
+  deploy:
+    desc: "Applies Terraform via Terragrunt (approval/stdin not needed)"
+    cmds:
+      - terragrunt apply -auto-approve

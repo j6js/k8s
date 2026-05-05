@@ -1,0 +1,47 @@
+version: "3"
+
+tasks:
+  test:
+    desc: "Validates `talhelper` config"
+    cmds:
+      - talhelper validate talconfig
+  deploy:
+    desc: "Deploy/Apply across Talos & Cilium CNI"
+    cmds:
+      - task: deploy-talos
+      - task: deploy-cni
+  decrypt:
+    - sops -d .sops/talsecret.yaml > talsecret.yaml
+  bootstrap:
+    desc: "Bootstraps Talos, etcd, and Cilium in that order (Only needed on first start/full reset, or if node is being re-created)"
+    cmds:
+      - task: bootstrap-talos
+      - task: bootstrap-etcd
+      - task: bootstrap-cni
+  bootstrap-talos:
+    - task: decrypt
+    - talhelper genconfig
+    - talhelper gencommand apply --extra-flags "--insecure" | bash
+  deploy-talos:
+    - task: decrypt
+    - talhelper genconfig
+    - talhelper gencommand apply | bash
+  bootstrap-etcd:
+    cmds:
+      - talhelper gencommand bootstrap | bash
+  bootstrap-cni:
+    deps:
+      - kubeconfig
+    cmds:
+      - ./scripts/cilium-bootstrap.sh
+  deploy-cni:
+    deps:
+      - kubeconfig
+    cmds:
+      - ./scripts/cilium-bootstrap.sh
+  kubeconfig:
+    vars:
+      CP_NODE:
+        sh: "grep -B 2 -A 2 'controlPlane: true' talconfig.yaml | grep ipAddress | head -1 | awk '{print $2}'"
+    cmds:
+      - talosctl --talosconfig clusterconfig/talosconfig --nodes {{.CP_NODE}} kubeconfig ../kubeconfig

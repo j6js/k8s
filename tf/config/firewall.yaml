@@ -1,0 +1,63 @@
+rules:
+  - name: talos-api
+    description: "Talos API access"
+    direction: ingress
+    protocol: tcp
+    ports: [50000]
+    source: internet
+    destination: ""
+    for_roles: [cp, sh, wk]
+
+  - name: k8s-api
+    description: "Kubernetes API access"
+    direction: ingress
+    protocol: tcp
+    ports: [6443]
+    source: internet
+    destination: ""
+    for_roles: [cp, sh]
+
+  - name: http
+    description: "HTTP ingress"
+    direction: ingress
+    protocol: tcp
+    ports: [80]
+    source: internet
+    destination: ""
+    for_roles: [cp, sh, wk]
+
+  - name: https
+    description: "HTTPS ingress"
+    direction: ingress
+    protocol: tcp
+    ports: [443]
+    source: internet
+    destination: ""
+    for_roles: [cp, sh, wk]
+
+  - name: inter-node-ingress
+    description: "Cluster node-to-node traffic"
+    direction: ingress
+    protocol: all
+    ports: []
+    source: all_vcns
+    destination: ""
+    for_roles: [cp, sh, wk]
+
+  - name: inter-node-egress
+    description: "Cluster node-to-node egress"
+    direction: egress
+    protocol: all
+    ports: []
+    source: ""
+    destination: all_vcns
+    for_roles: [cp, sh, wk]
+
+  - name: internet-egress
+    description: "Outbound internet access"
+    direction: egress
+    protocol: all
+    ports: []
+    source: ""
+    destination: internet
+    for_roles: [cp, sh, wk]

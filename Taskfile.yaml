@@ -1,0 +1,26 @@
+version: "3"
+
+includes:
+  tf:
+    taskfile: ./tf/Taskfile.yaml
+    dir: ./tf
+  talos:
+    taskfile: ./talos/Taskfile.yaml
+    dir: ./talos
+
+tasks:
+  test:
+    desc: "Tests and/or Validates Code and Config across whole repo"
+    cmds:
+      - task: "tf:test"
+      - task: "talos:test"
+  bootstrap:
+    desc: "Bootstraps all required components across whole repo (stdin/input *may* be required)"
+    cmds:
+      - task: "tf:bootstrap"
+      - task: "talos:bootstrap"
+  deploy:
+    desc: "Applies changes and/or Upgrades components across whole repo"
+    cmds:
+      - task: "tf:deploy"
+      - task: "talos:deploy"

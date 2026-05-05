@@ -1,0 +1,28 @@
+apiVersion: fluxcd.controlplane.io/v1
+kind: FluxInstance
+metadata:
+  name: flux
+  namespace: flux-system
+spec:
+  distribution:
+    version: "2.x"
+    registry: "ghcr.io/fluxcd"
+  components:
+    - source-controller
+    - kustomize-controller
+    - helm-controller
+    - notification-controller
+    - image-reflector-controller
+    - image-automation-controller
+  cluster:
+    type: kubernetes
+    multitenant: false
+    networkPolicy: true
+    domain: "hl.j6js.com"
+  sync:
+    kind: GitRepository
+    provider: github
+    url: "https://github.com/j6js/k8s.git"
+    ref: "refs/heads/stable"
+    path: "k8s/clusters/j6js-k8s"
+    pullSecret: "flux-system"
