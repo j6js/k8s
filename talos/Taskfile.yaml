@@ -18,6 +18,7 @@ tasks:
       - task: bootstrap-talos
       - task: bootstrap-etcd
       - task: bootstrap-cni
+      - task: bootstrap-flux
   bootstrap-talos:
     - task: decrypt
     - talhelper genconfig
@@ -39,6 +40,16 @@ tasks:
       - kubeconfig
     cmds:
       - ./scripts/cilium-bootstrap.sh
+  bootstrap-flux:
+    deps:
+      - kubeconfig
+    cmds:
+      - ./scripts/flux-bootstrap.sh
+  deploy-flux:
+    deps:
+      - kubeconfig
+    cmds:
+      - ./scripts/flux-bootstrap.sh
   kubeconfig:
     vars:
       CP_NODE:

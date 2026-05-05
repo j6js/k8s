@@ -37,19 +37,17 @@ GH_APP_ID="$(echo "${SOPS_CONTENTS}" | yq '.app-id')"
 GH_APP_INSTALLATION_ID="$(echo "${SOPS_CONTENTS}" | yq '.app-installation-id')"
 GH_APP_PRIVATE_KEY="$(echo "${SOPS_CONTENTS}" | yq '.app-private-key')"
 
-SECRET_API_FILE="
-apiVersion: v1
-kind: Secret
-metadata:
-  name: github-sa
-  namespace: flux-system
-type: Opaque
-stringData:
-  githubAppID: "${GH_APP_ID}"
-  githubAppInstallationID: "${GH_APP_INSTALLATION_ID}"
-  githubAppPrivateKey: \"${GH_APP_PRIVATE_KEY}\"
-"
-if KUBECONFIG="${KUBECONFIG}" helm status oci://ghcr.io/controlplaneio-fluxcd/charts/flux-operator  -n flux-system > /dev/null 2>&1; then
+
+if kubectl get secret githubapp -n flux-system > /dev/null 2>&1; then
+  echo "Secret alreary exists, updating"
+  KUBECONFIG="${KUBECONFIG}" kubectl delete secret githubapp -n flux-system
+  echo "${SOPS_CONTENTS}" | KUBECONFIG="${KUBECONFIG}" kubectl apply -f -
+else
+  echo "Secret does not exist"
+  echo "${SOPS_CONTENTS}" | KUBECONFIG="${KUBECONFIG}" kubectl apply -f -
+fi
+
+if KUBECONFIG="${KUBECONFIG}" helm status flux-operator  -n flux-system > /dev/null 2>&1; then
   echo "Flux Operator already present; running upgrade"
   KUBECONFIG="${KUBECONFIG}" helm upgrade flux-operator oci://ghcr.io/controlplaneio-fluxcd/charts/flux-operator "${flux_args[@]}"
 else
@@ -57,11 +55,8 @@ else
   KUBECONFIG="${KUBECONFIG}" helm install flux-operator oci://ghcr.io/controlplaneio-fluxcd/charts/flux-operator "${flux_args[@]}"
 fi
 
-if kubectl get secret githubapp -n flux-system > /dev/null 2>&1; then
-  echo "Secret alreary exists, updating"
-  kubectl delete secret githubapp -n flux-system
-  echo "${SECRET_API_FILE}" | kubectl apply -f -
-else
-  echo "Secret does not exist"
-  echo "${SECRET_API_FILE}" | kubectl apply -f -
-fi
+
+echo "Applying Flux Instance config"
+KUBECONFIG="${KUBECONFIG}" kubectl apply -f ${SCRIPT_DIR}/../flux/instance.yaml
+
+echo "Flux bootstrap complete"

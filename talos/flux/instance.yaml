@@ -18,11 +18,11 @@ spec:
     type: kubernetes
     multitenant: false
     networkPolicy: true
-    domain: "hl.j6js.com"
+    domain: "cluster.local"
   sync:
     kind: GitRepository
     provider: github
     url: "https://github.com/j6js/k8s.git"
-    ref: "refs/heads/stable"
+    ref: "refs/heads/main"
     path: "k8s/clusters/j6js-k8s"
-    pullSecret: "flux-system"
+    pullSecret: "github-sa"
