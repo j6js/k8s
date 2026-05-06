@@ -26,3 +26,14 @@ spec:
     ref: "refs/heads/main"
     path: "k8s/clusters/j6js-k8s"
     pullSecret: "github-sa"
+  kustomize:
+    patches:
+      - patch: |
+          - op: add
+            path: /spec/decryption
+            value:
+              provider: sops
+              secretRef:
+                name: sops-age
+        target:
+          kind: Kustomization

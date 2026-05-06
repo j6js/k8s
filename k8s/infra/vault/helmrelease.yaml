@@ -1,0 +1,59 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: vault
+  namespace: vault
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: vault
+      version: "0.32.0"
+      sourceRef:
+        kind: HelmRepository
+        name: hashicorp
+        namespace: vault
+      interval: 1h
+  values:
+    server:
+      standalone:
+        enabled: false
+      ha:
+        enabled: true
+        replicas: 3
+        raft:
+          enabled: true
+          setNodeId: true
+          config: |
+            ui = true
+
+            listener "tcp" {
+              tls_disable = 1
+              address = "[::]:8200"
+              cluster_address = "[::]:8201"
+            }
+
+            storage "raft" {
+              path = "/vault/data"
+            }
+
+            seal "ocikms" {
+              # Endpoints and Key ID are loaded from environment variables
+              crypto_endpoint     = "env(VAULT_OCI_KMS_CRYPTO_ENDPOINT)"
+              management_endpoint = "env(VAULT_OCI_KMS_MANAGEMENT_ENDPOINT)"
+              key_id              = "env(VAULT_OCI_KMS_KEY_ID)"
+            }
+
+      # Use envFrom to securely load all OCI configuration and endpoints
+      # directly from the SOPS-encrypted Kubernetes Secret we will create
+      extraEnvironmentVars:
+        VAULT_SEAL_TYPE: "ocikms"
+        OCI_PRIVATE_KEY_PATH: "/vault/custom-secrets/oci-api-key.pem"
+      envFrom:
+        - secretRef:
+            name: vault-oci-kms
+
+      extraVolumes:
+        - type: secret
+          name: vault-oci-kms
+          path: /vault/custom-secrets
