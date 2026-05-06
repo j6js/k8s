@@ -135,3 +135,13 @@ module "vm_${region}" {
   }
 }
 %{ endfor ~}
+
+module "kms_for_hc_vault" {
+  source = "./modules/oci/kms"
+  compartment_ocid = data.sops_file.oci_creds_regional["${regions[0]}"].data["compartment_ocid"]
+  tenancy_ocid = data.sops_file.oci_creds_regional["${regions[0]}"].data["tenancy_ocid"]
+  region = data.sops_file.oci_creds_regional["${regions[0]}"].data["region"]
+  providers = {
+    oci = oci.${regions[0]}
+  }
+}

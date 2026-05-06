@@ -49,6 +49,7 @@ cilium_args=(
   --set "kubeProxyReplacement=true"
   --set "k8sServiceHost=${K8S_SERVICE_HOST}"
   --set "k8sServicePort=${K8S_SERVICE_PORT}"
+  --set "gatewayAPI.enabled=true"
   --set securityContext.capabilities.ciliumAgent="{CHOWN,KILL,NET_ADMIN,NET_RAW,IPC_LOCK,SYS_ADMIN,SYS_RESOURCE,DAC_OVERRIDE,FOWNER,SETGID,SETUID}"
   --set securityContext.capabilities.cleanCiliumState="{NET_ADMIN,SYS_ADMIN,SYS_RESOURCE}"
   --set "cgroup.autoMount.enabled=false"

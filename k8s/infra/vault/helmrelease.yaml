@@ -38,22 +38,43 @@ spec:
             }
 
             seal "ocikms" {
-              # Endpoints and Key ID are loaded from environment variables
-              crypto_endpoint     = "env(VAULT_OCI_KMS_CRYPTO_ENDPOINT)"
-              management_endpoint = "env(VAULT_OCI_KMS_MANAGEMENT_ENDPOINT)"
-              key_id              = "env(VAULT_OCI_KMS_KEY_ID)"
+              auth_type_api_key   = true
+              crypto_endpoint     = "env(VAULT_OCIKMS_CRYPTO_ENDPOINT)"
+              management_endpoint = "env(VAULT_OCIKMS_MANAGEMENT_ENDPOINT)"
+              key_id              = "env(VAULT_OCIKMS_SEAL_KEY_ID)"
             }
 
-      # Use envFrom to securely load all OCI configuration and endpoints
-      # directly from the SOPS-encrypted Kubernetes Secret we will create
       extraEnvironmentVars:
         VAULT_SEAL_TYPE: "ocikms"
-        OCI_PRIVATE_KEY_PATH: "/vault/custom-secrets/oci-api-key.pem"
-      envFrom:
-        - secretRef:
-            name: vault-oci-kms
+        OCI_CONFIG_FILE: "/vault/userconfig/vault-oci-kms/config"
+        OCI_PRIVATE_KEY_PATH: "/vault/userconfig/vault-oci-kms/OCI_PRIVATE_KEY"
+
+      extraSecretEnvironmentVars:
+        - envName: VAULT_OCIKMS_CRYPTO_ENDPOINT
+          secretName: vault-oci-kms
+          secretKey: VAULT_OCIKMS_CRYPTO_ENDPOINT
+        - envName: VAULT_OCIKMS_MANAGEMENT_ENDPOINT
+          secretName: vault-oci-kms
+          secretKey: VAULT_OCIKMS_MANAGEMENT_ENDPOINT
+        - envName: VAULT_OCIKMS_SEAL_KEY_ID
+          secretName: vault-oci-kms
+          secretKey: VAULT_OCIKMS_SEAL_KEY_ID
+        - envName: OCI_REGION
+          secretName: vault-oci-kms
+          secretKey: OCI_REGION
+        - envName: OCI_TENANCY_OCID
+          secretName: vault-oci-kms
+          secretKey: OCI_TENANCY_OCID
+        - envName: OCI_USER_OCID
+          secretName: vault-oci-kms
+          secretKey: OCI_USER_OCID
+        - envName: OCI_FINGERPRINT
+          secretName: vault-oci-kms
+          secretKey: OCI_FINGERPRINT
+        - envName: OCI_PRIVATE_KEY
+          secretName: vault-oci-kms
+          secretKey: OCI_PRIVATE_KEY
 
       extraVolumes:
         - type: secret
           name: vault-oci-kms
-          path: /vault/custom-secrets

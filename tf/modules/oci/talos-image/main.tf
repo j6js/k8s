@@ -89,7 +89,7 @@ resource "oci_core_compute_image_capability_schema" "talos" {
 }
 
 resource "oci_core_shape_management" "talos_shapes" {
-  for_each = toset(var.shape_names)
+  for_each       = toset(var.shape_names)
   compartment_id = var.compartment_ocid
   image_id       = oci_core_image.talos.id
   shape_name     = each.value

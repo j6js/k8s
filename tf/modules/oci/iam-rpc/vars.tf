@@ -1,23 +1,23 @@
 variable "compartment_ocid" {
-  type = string
+  type        = string
   description = "The OCID of the compartment to create the policy in"
 }
 variable "acceptors" {
-  type = list(string)
+  type    = list(string)
   default = []
 }
 variable "requestors" {
-  type = list(string)
+  type    = list(string)
   default = []
 }
 variable "region_ocids" {
   type = map(object({
-    tenancy_ocid       = string
+    tenancy_ocid             = string
     administrator_group_ocid = string
   }))
   default = {}
 }
 variable "region_name" {
-  type = string
+  type        = string
   description = ""
 }
