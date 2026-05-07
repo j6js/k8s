@@ -48,6 +48,11 @@ resource "oci_identity_user_group_membership" "vault_auto_unseal" {
   user_id  = oci_identity_user.vault_auto_unseal.id
 }
 
+resource "oci_identity_user_group_membership" "vault_auto_unseal_admin" {
+  group_id = oci_identity_group.vault_auto_unseal.id
+  user_id  = var.user_ocid
+}
+
 resource "oci_identity_api_key" "vault_auto_unseal" {
   key_value = tls_private_key.vault_auto_unseal.public_key_pem
   user_id   = oci_identity_user.vault_auto_unseal.id
@@ -56,12 +61,14 @@ resource "oci_identity_api_key" "vault_auto_unseal" {
 }
 
 resource "oci_identity_policy" "vault_auto_unseal" {
-  compartment_id = var.tenancy_ocid
+  compartment_id = var.compartment_ocid
   description    = "Allow Vault auto-unseal user to use its OCI KMS key."
   name           = "vault-auto-unseal-kms"
 
   statements = [
     "Allow group ${oci_identity_group.vault_auto_unseal.name} to use vaults in compartment id ${var.compartment_ocid}",
     "Allow group ${oci_identity_group.vault_auto_unseal.name} to use keys in compartment id ${var.compartment_ocid}",
+    #"Allow group ${oci_identity_group.vault_auto_unseal.name} to manage dedicated-keys in compartment id ${var.compartment_ocid}",
+    #"Allow group ${oci_identity_group.vault_auto_unseal.name} to manage vault-secrets in compartment id ${var.compartment_ocid}",
   ]
 }

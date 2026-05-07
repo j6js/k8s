@@ -3,6 +3,11 @@ variable "compartment_ocid" {
   description = "The OCID of the compartment where the vault will be created."
 }
 
+variable "user_ocid" {
+  type        = string
+  description = "The OCID of the user to be added to the Vault auto-unseal group."
+}
+
 variable "tenancy_ocid" {
   type        = string
   description = "The tenancy OCID where IAM resources for Vault auto-unseal will be created."
