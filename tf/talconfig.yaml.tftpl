@@ -34,6 +34,8 @@ controlPlane:
   patches:
     - |-
       machine:
+        features:
+          iscsi: true
         time:
           servers:
             - time.cloudflare.com
@@ -52,6 +54,8 @@ worker:
   patches:
     - |-
       machine:
+        features:
+          iscsi: true
         network:
           nameservers:
             - 1.1.1.1
