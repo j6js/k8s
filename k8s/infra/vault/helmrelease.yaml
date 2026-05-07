@@ -40,12 +40,12 @@ spec:
               path = "/vault/data"
             }
 
-            seal "ocikms" {
-              auth_type_api_key   = true
-              crypto_endpoint     = "env(VAULT_OCIKMS_CRYPTO_ENDPOINT)"
-              management_endpoint = "env(VAULT_OCIKMS_MANAGEMENT_ENDPOINT)"
-              key_id              = "env(VAULT_OCIKMS_SEAL_KEY_ID)"
-            }
+          # seal "ocikms" {
+          #   auth_type_api_key   = true
+          #   crypto_endpoint     = "env(VAULT_OCIKMS_CRYPTO_ENDPOINT)"
+          #   management_endpoint = "env(VAULT_OCIKMS_MANAGEMENT_ENDPOINT)"
+          #   key_id              = "env(VAULT_OCIKMS_SEAL_KEY_ID)"
+          # }
 
       extraEnvironmentVars:
         VAULT_SEAL_TYPE: "ocikms"
