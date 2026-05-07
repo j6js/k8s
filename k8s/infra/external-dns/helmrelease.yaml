@@ -1,0 +1,90 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: external-dns
+  namespace: external-dns
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: vault
+      version: "0.32.0"
+      sourceRef:
+        kind: HelmRepository
+        name: external-dns
+        namespace: external-dns
+      interval: 1h
+  values:
+    server:
+      dataStorage:
+        enabled: true
+        storageClass: longhorn
+      standalone:
+        enabled: false
+      ha:
+        enabled: true
+        replicas: 3
+        raft:
+          enabled: true
+          setNodeId: true
+          config: |
+            ui = true
+
+            listener "tcp" {
+              tls_disable = 1
+              address = "[::]:8200"
+              cluster_address = "[::]:8201"
+            }
+
+            storage "raft" {
+              path = "/vault/data"
+            }
+
+            seal "ocikms" {
+              auth_type_api_key = true
+            }
+
+      extraEnvironmentVars:
+        VAULT_SEAL_TYPE: "ocikms"
+        OCI_CONFIG_FILE: "/vault/userconfig/vault-oci-kms/config"
+        OCI_PRIVATE_KEY_PATH: "/vault/userconfig/vault-oci-kms/OCI_PRIVATE_KEY"
+        OCI_private_key_path: "/vault/userconfig/vault-oci-kms/OCI_PRIVATE_KEY"
+
+      extraSecretEnvironmentVars:
+        - envName: VAULT_OCIKMS_CRYPTO_ENDPOINT
+          secretName: vault-oci-kms
+          secretKey: VAULT_OCIKMS_CRYPTO_ENDPOINT
+        - envName: VAULT_OCIKMS_MANAGEMENT_ENDPOINT
+          secretName: vault-oci-kms
+          secretKey: VAULT_OCIKMS_MANAGEMENT_ENDPOINT
+        - envName: VAULT_OCIKMS_SEAL_KEY_ID
+          secretName: vault-oci-kms
+          secretKey: VAULT_OCIKMS_SEAL_KEY_ID
+        - envName: OCI_REGION
+          secretName: vault-oci-kms
+          secretKey: OCI_REGION
+        - envName: OCI_TENANCY_OCID
+          secretName: vault-oci-kms
+          secretKey: OCI_TENANCY_OCID
+        - envName: OCI_tenancy_ocid
+          secretName: vault-oci-kms
+          secretKey: OCI_TENANCY_OCID
+        - envName: OCI_USER_OCID
+          secretName: vault-oci-kms
+          secretKey: OCI_USER_OCID
+        - envName: OCI_user_ocid
+          secretName: vault-oci-kms
+          secretKey: OCI_USER_OCID
+        - envName: OCI_FINGERPRINT
+          secretName: vault-oci-kms
+          secretKey: OCI_FINGERPRINT
+        - envName: OCI_fingerprint
+          secretName: vault-oci-kms
+          secretKey: OCI_FINGERPRINT
+        - envName: OCI_PRIVATE_KEY
+          secretName: vault-oci-kms
+          secretKey: OCI_PRIVATE_KEY
+
+      extraVolumes:
+        - type: secret
+          name: vault-oci-kms

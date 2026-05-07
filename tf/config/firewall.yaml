@@ -61,3 +61,12 @@ rules:
     source: ""
     destination: internet
     for_roles: [cp, sh, wk]
+
+  - name: nodeport
+    description: "Kubernetes LoadBalancer NodePort ingress"
+    direction: ingress
+    protocol: tcp
+    ports: [30000, 32767]
+    source: internet
+    destination: ""
+    for_roles: [cp, sh, wk]

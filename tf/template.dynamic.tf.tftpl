@@ -6,3 +6,12 @@ resource "local_file" "talconfig" {
     nodes            = local.nodes_with_ips
   })
 }
+
+resource "local_file" "oci_ccm_secret" {
+  filename = "${terragrunt_dir}/../k8s/infra/oci-cloud-controller-manager/cloud-provider.secret.yaml"
+  content = templatefile("${terragrunt_dir}/oci-ccm-secret.yaml.tftpl", {
+    compartment_ocid = data.sops_file.oci_creds_regional[local.oci_ccm_region].data["compartment_ocid"]
+    vcn_id           = module.vcn_ap-sydney-1.vcn_id
+    subnet_id        = module.subnet_ap-sydney-1.subnet_id
+  })
+}

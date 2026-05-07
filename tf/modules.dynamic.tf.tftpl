@@ -88,6 +88,16 @@ module "iam_${region}" {
 }
 %{ endfor ~}
 
+module "iam_ccm" {
+  source = "./modules/oci/iam-ccm"
+  tenancy_ocid = data.sops_file.oci_creds_regional[local.oci_ccm_region].data["tenancy_ocid"]
+  compartment_ocid = data.sops_file.oci_creds_regional[local.oci_ccm_region].data["compartment_ocid"]
+  region_name = local.oci_ccm_region
+  providers = {
+    oci = oci.ap-sydney-1
+  }
+}
+
 %{ for region in regions ~}
 module "talos-image_${region}" {
   source = "./modules/oci/talos-image"

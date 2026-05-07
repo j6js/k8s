@@ -17,6 +17,8 @@ schematic:
 patches:
   - |-
     cluster:
+      externalCloudProvider:
+        enabled: true
       network:
         cni:
           name: none
@@ -87,6 +89,15 @@ nodes:
         dhcp: true
         dhcpOptions:
           ipv6: true
+    patches:
+      - |-
+        machine:
+          kubelet:
+            extraArgs:
+              provider-id: ${node.provider_id}
+%{ if node.oci_lb ~}
+              node-labels: oci-lb=j6js-public
+%{ endif ~}
 
 %{ endif ~}
 %{ endfor ~}
@@ -103,6 +114,14 @@ nodes:
         dhcpOptions:
           ipv6: true
     patches:
+      - |-
+        machine:
+          kubelet:
+            extraArgs:
+              provider-id: ${node.provider_id}
+%{ if node.oci_lb ~}
+              node-labels: oci-lb=j6js-public
+%{ endif ~}
       - |-
         cluster:
           allowSchedulingOnControlPlanes: true
@@ -121,5 +140,14 @@ nodes:
         dhcp: true
         dhcpOptions:
           ipv6: true
+    patches:
+      - |-
+        machine:
+          kubelet:
+            extraArgs:
+              provider-id: ${node.provider_id}
+%{ if node.oci_lb ~}
+              node-labels: oci-lb=j6js-public
+%{ endif ~}
 %{ endif ~}
 %{ endfor ~}

@@ -76,12 +76,17 @@ locals {
   all_public_ips   = merge(module.vm_ap-sydney-1.public_ips, module.vm_ap-melbourne-1.public_ips)
   all_private_ips  = merge(module.vm_ap-sydney-1.private_ips, module.vm_ap-melbourne-1.private_ips)
   all_public_ipv6s = merge(module.vm_ap-sydney-1.public_ipv6s, module.vm_ap-melbourne-1.public_ipv6s)
+  all_instance_ids = merge(module.vm_ap-sydney-1.instance_ids, module.vm_ap-melbourne-1.instance_ids)
+  oci_ccm_region   = [for vm in local.vm_list : vm.region if vm.type == "cp"][0]
   nodes_with_ips = {
     for name, vm in local.vms :
     name => {
       name        = name
       role        = vm.type
+      region      = vm.region
+      provider_id = local.all_instance_ids[name]
       public_ipv6 = local.all_public_ipv6s[name]
+      oci_lb      = vm.region == local.oci_ccm_region && contains(["cp", "sh"], vm.type)
     }
   }
 }
