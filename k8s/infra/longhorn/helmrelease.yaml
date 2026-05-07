@@ -4,6 +4,8 @@ metadata:
   name: longhorn-release
   namespace: longhorn-system
 spec:
+  install:
+    createNamespace: false
   chart:
     spec:
       chart: longhorn
