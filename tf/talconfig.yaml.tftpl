@@ -7,6 +7,13 @@ imageFactory:
   protocol: http
   installerURLTmpl: "{{.RegistryURL}}/oracle-installer/{{.ID}}:{{.Version}}"
 
+schematic:
+  customization:
+    systemExtensions:
+      officialExtensions:
+        - siderolabs/iscsi-tools
+        - siderolabs/util-linux-tools
+
 patches:
   - |-
     cluster:
@@ -34,8 +41,6 @@ controlPlane:
   patches:
     - |-
       machine:
-        features:
-          iscsi: true
         time:
           servers:
             - time.cloudflare.com
@@ -54,8 +59,6 @@ worker:
   patches:
     - |-
       machine:
-        features:
-          iscsi: true
         network:
           nameservers:
             - 1.1.1.1
@@ -71,6 +74,12 @@ nodes:
 %{ if node.role == "cp" ~}
   - hostname: ${ replace(name, "_", "-") }
     ipAddress: ${node.public_ipv6}
+    schematic: &default-schematic
+      customization:
+        systemExtensions:
+          officialExtensions:
+            - siderolabs/iscsi-tools
+            - siderolabs/util-linux-tools
     controlPlane: true
     installDisk: /dev/sda
     networkInterfaces:
@@ -85,6 +94,7 @@ nodes:
 %{ if node.role == "sh" ~}
   - hostname: ${ replace(name, "_", "-") }
     ipAddress: ${node.public_ipv6}
+    schematic: *default-schematic
     controlPlane: true
     installDisk: /dev/sda
     networkInterfaces:
@@ -103,6 +113,7 @@ nodes:
 %{ if node.role == "wk" ~}
   - hostname: ${ replace(name, "_", "-") }
     ipAddress: ${node.public_ipv6}
+    schematic: *default-schematic
     controlPlane: false
     installDisk: /dev/sda
     networkInterfaces:

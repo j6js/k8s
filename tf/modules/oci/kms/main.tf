@@ -61,6 +61,7 @@ resource "oci_identity_policy" "vault_auto_unseal" {
   name           = "vault-auto-unseal-kms"
 
   statements = [
-    "Allow group ${oci_identity_group.vault_auto_unseal.name} to use keys in compartment id ${var.compartment_ocid} where target.key.id = '${oci_kms_key.hc_vault_oci_kms_key.id}'",
+    "Allow group ${oci_identity_group.vault_auto_unseal.name} to use vaults in compartment id ${var.compartment_ocid}",
+    "Allow group ${oci_identity_group.vault_auto_unseal.name} to use keys in compartment id ${var.compartment_ocid}",
   ]
 }

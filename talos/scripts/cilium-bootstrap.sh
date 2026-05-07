@@ -26,9 +26,9 @@ if [[ ! -f "${KUBECONFIG}" ]]; then
   exit 1
 fi
 
-CILIUM_VERSION="${CILIUM_VERSION:-1.19.3}"
-K8S_SERVICE_HOST="${K8S_SERVICE_HOST:-localhost}"
-K8S_SERVICE_PORT="${K8S_SERVICE_PORT:-7445}"
+CILIUM_VERSION="1.20.0-pre.2"
+K8S_SERVICE_HOST="localhost"
+K8S_SERVICE_PORT="7445"
 
 # Ensure Helm repo is added and up-to-date
 helm repo add cilium https://helm.cilium.io/ >/dev/null 2>&1 || true
