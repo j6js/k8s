@@ -24,6 +24,9 @@ spec:
         raft:
           enabled: true
           setNodeId: true
+        dataStorage:
+          enabled: true
+          storageClass: longhorn
           config: |
             ui = true
 
