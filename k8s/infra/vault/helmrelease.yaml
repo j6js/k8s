@@ -47,8 +47,6 @@ spec:
       extraEnvironmentVars:
         VAULT_SEAL_TYPE: "ocikms"
         OCI_CONFIG_FILE: "/vault/userconfig/vault-oci-kms/config"
-        OCI_PRIVATE_KEY_PATH: "/vault/userconfig/vault-oci-kms/OCI_PRIVATE_KEY"
-
       extraSecretEnvironmentVars:
         - envName: VAULT_OCIKMS_CRYPTO_ENDPOINT
           secretName: vault-oci-kms
