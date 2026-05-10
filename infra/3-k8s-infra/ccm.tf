@@ -19,13 +19,13 @@ resource "kubernetes_secret_v1" "ccm_secret" {
     data = {
         "cloud-provider.yaml" = templatefile("${path.module}/ccm-secret.yaml.tftpl", {
             region = each.key,
-            tenancy_ocid = each.value.OCI_TENANCY_OCID
-            user_ocid = each.value.OCI_USER_OCID,
-            fingerprint = each.value.OCI_FINGERPRINT
-            private_key = each.value.OCI_PRIVATE_KEY
-            compartment_ocid = each.value.OCI_COMPARTMENT_OCID
-            subnet_ocid = each.value.OCI_SUBNET_OCID
-            vcn_ocid = each.value.OCI_VCN_OCID
+            tenancy_ocid = sensitive(each.value.OCI_TENANCY_OCID)
+            user_ocid = sensitive(each.value.OCI_USER_OCID)
+            fingerprint = sensitive(each.value.OCI_FINGERPRINT)
+            private_key = sensitive(each.value.OCI_PRIVATE_KEY)
+            compartment_ocid = sensitive(each.value.OCI_COMPARTMENT_OCID)
+            subnet_ocid = sensitive(each.value.OCI_SUBNET_OCID)
+            vcn_ocid = sensitive(each.value.OCI_VCN_OCID)
 
         })
     }

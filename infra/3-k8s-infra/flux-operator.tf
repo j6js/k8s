@@ -2,7 +2,6 @@ resource "kubernetes_namespace_v1" "flux_system" {
     metadata {
         name = "flux-system"
     }
-    depends_on = [kubernetes_manifest.ccm]
 }
 
 resource "kubernetes_secret_v1" "flux_sops_secret" {
@@ -31,6 +30,11 @@ resource "helm_release" "flux_operator" {
     chart      = "flux-operator"
     namespace  = "flux-system"
     version    = "0.48.0"
+    depends_on = [
+        kubernetes_namespace_v1.flux_system,
+        kubernetes_secret_v1.flux_sops_secret,
+        kubernetes_secret_v1.flux_operator_secret
+    ]
 }
 
 resource "kubectl_manifest" "flux_operator" {

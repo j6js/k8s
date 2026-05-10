@@ -8,6 +8,13 @@ locals {
     "OCI_USER_OCID"                    = oci_identity_user.vault_auto_unseal.id
     "OCI_FINGERPRINT"                  = oci_identity_api_key.vault_auto_unseal.fingerprint
     "OCI_PRIVATE_KEY"                  = tls_private_key.vault_auto_unseal.private_key_pem
+    "config"                           = templatefile("${path.module}/oci-config.tftpl", {
+      region               = var.region
+      tenancy_ocid         = var.tenancy_ocid
+      user_ocid           = oci_identity_user.vault_auto_unseal.id
+      fingerprint         = oci_identity_api_key.vault_auto_unseal.fingerprint
+      key_file            = "/vault/userconfig/vault-oci-kms/OCI_PRIVATE_KEY"
+    })
   }
 }
 output "kms_secrets" {

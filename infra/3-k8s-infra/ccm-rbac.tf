@@ -30,7 +30,8 @@ resource "kubernetes_manifest" "ccm_cluster_role_binding" {
     }
 }
 resource "kubernetes_manifest" "ccm_rbac" {
-    manifest = yamldecode(
+    # Sensitive because it's a large manifest and we don't want to log it in plaintext (and it doesn't contain any secrets btw)
+    manifest = sensitive(yamldecode(
         <<EOF
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -180,5 +181,5 @@ rules:
   - patch
 
   EOF
-    )
+    ))
 }

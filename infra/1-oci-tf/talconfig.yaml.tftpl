@@ -1,10 +1,10 @@
-clusterName: ${cluster_name}
-endpoint: https://[${cluster_endpoint}]:6443
+clusterName: "${cluster_name}"
+endpoint: "https://[${cluster_endpoint}]:6443"
 
 imageFactory:
-  registryURL: factory.talos.dev
-  schematicEndpoint: /schematics
-  protocol: http
+  registryURL: "factory.talos.dev"
+  schematicEndpoint: "/schematics"
+  protocol: "http"
   installerURLTmpl: "{{.RegistryURL}}/oracle-installer/{{.ID}}:{{.Version}}"
 
 patches:
@@ -24,12 +24,19 @@ patches:
         net.ipv4.conf.all.rp_filter: "0"
         net.ipv4.conf.default.rp_filter: "0"
 
+schematic:
+  customization:
+    systemExtensions:
+      officialExtensions:
+        - siderolabs/iscsi-tools
+        - siderolabs/util-linux-tools
+
 talosVersion: v1.13.0
 
 additionalApiServerCertSans:
-  - ${cluster_endpoint}
+  - "${cluster_endpoint}"
 %{ for name, node in nodes ~}
-  - ${node.public_ipv6}
+  - "${node.public_ipv6}"
 %{ endfor ~}
 
 controlPlane:
@@ -67,15 +74,13 @@ worker:
 nodes:
 %{ for name, node in nodes ~}
 %{ if node.role == "cp" ~}
-  - hostname: ${ replace(name, "_", "-") }
-    ipAddress: ${node.public_ipv6}
-    schematic: &default-schematic
-      customization:
-        systemExtensions:
-          officialExtensions:
-            - siderolabs/iscsi-tools
-            - siderolabs/util-linux-tools
+  - hostname: "${ replace(name, "_", "-") }"
+    ipAddress: "${node.public_ipv6}"
+
     controlPlane: true
+    nodeLabels:
+      "topology.kubernetes.io/region": "${node.region}"
+      "oci.oraclecloud.com/ip-family-ipv6": "true"
     nodeAnnotations:
       "oci.oraclecloud.com/compartment-id": "${node.compartment_ocid}"
     installDisk: /dev/sda
@@ -90,16 +95,17 @@ nodes:
           kubelet:
             extraArgs:
               provider-id: ${node.provider_id}
-              node-labels: "topology.kubernetes.io/region=${node.region}"
 
 %{ endif ~}
 %{ endfor ~}
 %{ for name, node in nodes ~}
 %{ if node.role == "sh" ~}
-  - hostname: ${ replace(name, "_", "-") }
-    ipAddress: ${node.public_ipv6}
-    schematic: *default-schematic
+  - hostname: "${ replace(name, "_", "-") }"
+    ipAddress: "${node.public_ipv6}"
     controlPlane: true
+    nodeLabels:
+      "topology.kubernetes.io/region": "${node.region}"
+      "oci.oraclecloud.com/ip-family-ipv6": "true"
     nodeAnnotations:
       "oci.oraclecloud.com/compartment-id": "${node.compartment_ocid}"
     installDisk: /dev/sda
@@ -114,7 +120,6 @@ nodes:
           kubelet:
             extraArgs:
               provider-id: ${node.provider_id}
-              node-labels: "topology.kubernetes.io/region=${node.region}"
         cluster:
           allowSchedulingOnControlPlanes: true
 
@@ -122,11 +127,13 @@ nodes:
 %{ endfor ~}
 %{ for name, node in nodes ~}
 %{ if node.role == "wk" ~}
-  - hostname: ${ replace(name, "_", "-") }
-    ipAddress: ${node.public_ipv6}
-    schematic: *default-schematic
+  - hostname: "${ replace(name, "_", "-") }"
+    ipAddress: "${node.public_ipv6}"
     controlPlane: false
     installDisk: /dev/sda
+    nodeLabels:
+      "topology.kubernetes.io/region": "${node.region}"
+      "oci.oraclecloud.com/ip-family-ipv6": "true"
     nodeAnnotations:
       "oci.oraclecloud.com/compartment-id": "${node.compartment_ocid}"
     networkInterfaces:
@@ -140,6 +147,5 @@ nodes:
           kubelet:
             extraArgs:
               provider-id: ${node.provider_id}
-              node-labels: "topology.kubernetes.io/region=${node.region}"
 %{ endif ~}
 %{ endfor ~}
