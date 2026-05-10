@@ -7,5 +7,5 @@ resource "kubernetes_secret" "vault_oci_kms" {
     name      = "vault-oci-kms"
     namespace = "vault"
   }
-  data = vault_kms_input
+  data = local.vault_kms_input
 }
