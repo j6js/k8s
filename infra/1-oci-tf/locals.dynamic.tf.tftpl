@@ -1,0 +1,27 @@
+locals {
+  ccm_secrets = {
+%{ for region in regions_list ~}
+    "${region}" = module.iam_ccm_user_${region}.ccm_secrets,
+%{ endfor ~}
+  }
+  all_public_ipv4s = merge(
+    %{ for region in regions_list ~}
+     module.vm_${region}.public_ips,
+    %{ endfor ~}
+  )
+  all_private_ips = merge(
+    %{ for region in regions_list ~}
+     module.vm_${region}.private_ips,
+    %{ endfor ~}
+  )
+  all_public_ipv6s = merge(
+    %{ for region in regions_list ~}
+     module.vm_${region}.public_ipv6s,
+    %{ endfor ~}
+  )
+  all_instance_ids = merge(
+    %{ for region in regions_list ~}
+     module.vm_${region}.instance_ids,
+    %{ endfor ~}
+  )
+}

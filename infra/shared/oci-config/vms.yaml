@@ -1,0 +1,43 @@
+# vms.yaml : Define VMs to be created by terraform
+# type: [cp, sh, wk] # Control Plane, Shared (cp + wk), Worker
+# cpu: int # Number of OCPUs/full cores, vCPU is double the OCPU count
+# ram: int # RAM in GB
+# disk: int # OS Disk size in GB
+# region: string # OCI region to create the VM in, e.g. ap-sydney-1, ap-melbourne-1
+vms:
+    - name: syd-cp1
+      type: cp
+      cpu: 1
+      ram: 8
+      disk: 65
+      region: ap-sydney-1
+    - name: syd-sh1
+      type: sh
+      cpu: 1
+      ram: 8
+      disk: 65
+      region: ap-sydney-1
+    - name: syd-wk1
+      type: wk
+      cpu: 1
+      ram: 8
+      disk: 65
+      region: ap-sydney-1
+    - name: mel-cp1
+      type: cp
+      cpu: 1
+      ram: 8
+      disk: 65
+      region: ap-melbourne-1
+    - name: mel-sh1
+      type: sh
+      cpu: 1
+      ram: 8
+      disk: 65
+      region: ap-melbourne-1
+    - name: mel-wk1
+      type: wk
+      cpu: 1
+      ram: 8
+      disk: 65
+      region: ap-melbourne-1

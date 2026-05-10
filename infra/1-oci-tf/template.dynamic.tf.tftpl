@@ -1,0 +1,8 @@
+resource "local_file" "talconfig" {
+  filename = "${terragrunt_dir}/../2-talhelper/talconfig.yaml"
+  content = templatefile("${terragrunt_dir}/talconfig.yaml.tftpl", {
+    cluster_name      = "j6js-k8s"
+    cluster_endpoint = [for name, node in local.nodes_with_ips : node.public_ipv6 if node.role == "cp"][0]
+    nodes            = local.nodes_with_ips
+  })
+}

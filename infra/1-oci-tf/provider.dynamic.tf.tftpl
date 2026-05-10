@@ -1,0 +1,27 @@
+terraform {
+  required_providers {
+    oci = {
+      source  = "oracle/oci"
+      version = "8.12.0"
+    }
+    sops = {
+      source  = "carlpett/sops"
+      version = "1.4.1"
+    }
+  }
+}
+
+locals {
+  terragrunt_dir = "${terragrunt_dir}"
+}
+
+%{ for region in regions ~}
+provider "oci" {
+  alias        = "${region}"
+  tenancy_ocid = data.sops_file.oci_creds_regional["${region}"].data["tenancy_ocid"]
+  region       = data.sops_file.oci_creds_regional["${region}"].data["region"]
+  user_ocid    = data.sops_file.oci_creds_regional["${region}"].data["user_ocid"]
+  fingerprint  = data.sops_file.oci_creds_regional["${region}"].data["fingerprint"]
+  private_key  = data.sops_file.oci_creds_regional["${region}"].data["private_key"]
+}
+%{ endfor ~}

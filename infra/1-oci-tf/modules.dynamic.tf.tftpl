@@ -1,0 +1,175 @@
+%{ for region in regions ~}
+module "vcn_${region}" {
+  source = "./modules/oci/vcn"
+  compartment_ocid = data.sops_file.oci_creds_regional["${region}"].data["compartment_ocid"]
+  priv_ipv4_cidr = local.region_cidrs["${region}"]
+  providers = {
+    oci = oci.${region}
+  }
+}
+%{ endfor ~}
+
+%{ for region in regions ~}
+module "subnet_${region}" {
+  source = "./modules/oci/subnet"
+  compartment_ocid = data.sops_file.oci_creds_regional["${region}"].data["compartment_ocid"]
+  vcn_id = module.vcn_${region}.vcn_id
+  ig_id = module.vcn_${region}.ig_id
+  region_ocids = local.region_ocids
+  region_name = "${region}"
+  current_ipv6_cidr = module.vcn_${region}.ipv6_cidr
+  priv_ipv4_cidr = module.vcn_${region}.ipv4_cidr
+  rpc_acceptors_to_create = tolist(local.acceptors_by_region["${region}"])
+  ipv4_of_all_other_regions = {
+%{ for other in regions ~}
+%{ if other != region ~}
+    "${other}" = module.vcn_${other}.ipv4_cidr
+%{ endif ~}
+%{ endfor ~}
+  }
+  ipv6_of_all_other_regions = {
+%{ for other in regions ~}
+%{ if other != region ~}
+    "${other}" = module.vcn_${other}.ipv6_cidr
+%{ endif ~}
+%{ endfor ~}
+  }
+  providers = {
+    oci = oci.${region}
+  }
+}
+%{ endfor ~}
+
+%{ for region in regions ~}
+module "requestor_rpc_${region}" {
+  source = "./modules/oci/requestor-rpc"
+  count = length(local.requestors_by_region["${region}"]) > 0 ? 1 : 0
+  requestor_region_names = tomap({ for r in local.requestors_by_region["${region}"] : r => r })
+  region_name = "${region}"
+  all_rpc_ocids = {
+%{ for peer_region in regions ~}
+    "${peer_region}" = module.subnet_${peer_region}.rpc_ocids
+%{ endfor ~}
+  }
+  ipv4_of_all_other_regions = {
+%{ for other in regions ~}
+%{ if other != region ~}
+    "${other}" = module.vcn_${other}.ipv4_cidr
+%{ endif ~}
+%{ endfor ~}
+  }
+  ipv6_of_all_other_regions = {
+%{ for other in regions ~}
+%{ if other != region ~}
+    "${other}" = module.vcn_${other}.ipv6_cidr
+%{ endif ~}
+%{ endfor ~}
+  }
+  drg_id = module.subnet_${region}.drg_id
+  drg_route_table_id = module.subnet_${region}.drg_route_table_id
+  compartment_ocid = data.sops_file.oci_creds_regional["${region}"].data["compartment_ocid"]
+  providers = {
+    oci = oci.${region}
+  }
+}
+%{ endfor ~}
+
+%{ for region in regions ~}
+module "iam_${region}" {
+  source = "./modules/oci/iam-rpc"
+  acceptors = local.acceptors_by_region["${region}"]
+  requestors = local.requestors_by_region["${region}"]
+  region_ocids = local.region_ocids
+  region_name = "${region}"
+  compartment_ocid = data.sops_file.oci_creds_regional["${region}"].data["compartment_ocid"]
+  providers = {
+    oci = oci.${region}
+  }
+}
+%{ endfor ~}
+
+%{ for region in regions ~}
+module "iam_ccm_user_${region}" {
+  source = "./modules/oci/iam-ccm-user"
+  compartment_ocid = data.sops_file.oci_creds_regional["${region}"].data["compartment_ocid"]
+  tenancy_ocid = data.sops_file.oci_creds_regional["${region}"].data["tenancy_ocid"]
+  region = "${region}"
+  subnet_ocid = module.subnet_${region}.subnet_id
+  vcn_ocid = module.vcn_${region}.vcn_id
+  admin_user_ocid = data.sops_file.oci_creds_regional["${region}"].data["user_ocid"]
+  providers = {
+    oci = oci.${region}
+  }
+}
+%{ endfor ~}
+
+%{ for region in regions ~}
+module "iam_ccm_${region}" {
+  source = "./modules/oci/iam-ccm"
+  region_name = "${region}"
+  compartment_ocid = data.sops_file.oci_creds_regional["${region}"].data["compartment_ocid"]
+  group_ocid = module.iam_ccm_user_${region}.ccm_group_ocid
+  providers = {
+    oci = oci.${region}
+  }
+  depends_on = [module.iam_ccm_user_${region}]
+}
+%{ endfor ~}
+%{ for region in regions ~}
+module "talos-image_${region}" {
+  source = "./modules/oci/talos-image"
+  compartment_ocid = data.sops_file.oci_creds_regional["${region}"].data["compartment_ocid"]
+  talos_version   = local.talos_config.version
+  architecture    = local.talos_config.architecture
+  qcow2_source = "${terragrunt_dir}/talos/oracle-$${local.talos_config.architecture}.qcow2"
+  shape_names     = ["VM.Standard.A1.Flex"]
+  providers = {
+    oci = oci.${region}
+  }
+}
+%{ endfor ~}
+
+
+%{ for region in regions ~}
+module "vm_${region}" {
+  source = "./modules/oci/vm"
+  compartment_ocid   = data.sops_file.oci_creds_regional["${region}"].data["compartment_ocid"]
+  tenancy_ocid       = data.sops_file.oci_creds_regional["${region}"].data["tenancy_ocid"]
+  subnet_id          = module.subnet_${region}.subnet_id
+  vcn_id            = module.vcn_${region}.vcn_id
+  local_ipv4_cidr   = module.vcn_${region}.ipv4_cidr
+  local_ipv6_cidr   = module.vcn_${region}.ipv6_cidr
+  peer_ipv4_cidrs = {
+%{ for other in regions ~}
+%{ if other != region ~}
+    "${other}" = module.vcn_${other}.ipv4_cidr
+%{ endif ~}
+%{ endfor ~}
+  }
+  peer_ipv6_cidrs = {
+%{ for other in regions ~}
+%{ if other != region ~}
+    "${other}" = module.vcn_${other}.ipv6_cidr
+%{ endif ~}
+%{ endfor ~}
+  }
+  image_id           = module.talos-image_${region}.image_id
+  vms                = { for k, v in local.vms : k => v if v.region == "${region}" }
+  firewall_rules     = local.firewall_rules
+  assign_public_ip   = true
+  providers = {
+    oci = oci.${region}
+  }
+}
+%{ endfor ~}
+
+module "kms_for_hc_vault" {
+  source = "./modules/oci/kms"
+  compartment_ocid = data.sops_file.oci_creds_regional["${regions[0]}"].data["compartment_ocid"]
+  tenancy_ocid = data.sops_file.oci_creds_regional["${regions[0]}"].data["tenancy_ocid"]
+  user_ocid = data.sops_file.oci_creds_regional["${regions[0]}"].data["user_ocid"]
+  region = data.sops_file.oci_creds_regional["${regions[0]}"].data["region"]
+  providers = {
+    oci = oci.${regions[0]}
+  }
+}
