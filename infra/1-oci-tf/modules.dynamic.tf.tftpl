@@ -163,6 +163,27 @@ module "vm_${region}" {
 }
 %{ endfor ~}
 
+%{ for region in regions ~}
+module "nlb_${region}" {
+  source = "./modules/oci/nlb"
+  compartment_id = data.sops_file.oci_creds_regional["${region}"].data["compartment_ocid"]
+  region = "${region}"
+  subnet_id = module.subnet_${region}.subnet_id
+  backends = {
+%{ for name, vm in vms_by_region[region] ~}
+    "${name}" = {
+      private_ipv4 = module.vm_${region}.private_ips["${name}"]
+      public_ipv6 = module.vm_${region}.public_ipv6s["${name}"]
+      role = "${vm.type}"
+    }
+%{ endfor ~}
+  }
+  providers = {
+    oci = oci.${region}
+  }
+}
+%{ endfor ~}
+
 module "kms_for_hc_vault" {
   source = "./modules/oci/kms"
   compartment_ocid = data.sops_file.oci_creds_regional["${regions[0]}"].data["compartment_ocid"]

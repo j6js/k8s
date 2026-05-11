@@ -1,5 +1,5 @@
 resource "local_file" "output_json" {
-  content  = jsonencode({
+  content = jsonencode({
     nodes = [
       for name, vm in local.vms : {
         name        = name
@@ -9,7 +9,8 @@ resource "local_file" "output_json" {
         role        = vm.type
       }
     ]
-    vault_kms = module.kms_for_hc_vault.kms_secrets
+    nlb_ingress = local.nlb_ingress
+    vault_kms   = module.kms_for_hc_vault.kms_secrets
     ccm_secrets = local.ccm_secrets
   })
   filename = "${local.terragrunt_dir}/config/outputs/1-oci-tf.json"

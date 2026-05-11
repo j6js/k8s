@@ -24,4 +24,15 @@ locals {
      module.vm_${region}.instance_ids,
     %{ endfor ~}
   )
+  nlb_ingress = {
+%{ for region in regions_list ~}
+    "${region}" = {
+      id           = module.nlb_${region}.id
+      public_ipv4  = module.nlb_${region}.public_ipv4
+      public_ipv6  = module.nlb_${region}.public_ipv6
+      private_ipv4 = module.nlb_${region}.private_ipv4
+      dns_targets  = module.nlb_${region}.dns_targets
+    }
+%{ endfor ~}
+  }
 }

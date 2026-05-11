@@ -4,3 +4,6 @@ data "sops_file" "flux_operator" {
 data "sops_file" "flux_sops"{
     source_file = "${path.module}/../.sops/flux-sops.yaml"
 }
+data "sops_file" "cloudflare"{
+    source_file = "${path.module}/../.sops/cloudflare.yaml"
+}

@@ -28,6 +28,8 @@ locals {
   pairings             = { for pair in setproduct(local.sorted_regions, local.sorted_regions) : "${pair[0]}-to-${pair[1]}" => { acceptor_region = pair[0], requestor_region = pair[1] } if index(local.sorted_regions, pair[0]) < index(local.sorted_regions, pair[1]) }
   acceptors_by_region  = { for region in local.sorted_regions : region => [for k, v in local.pairings : v.requestor_region if v.acceptor_region == region] }
   requestors_by_region = { for region in local.sorted_regions : region => [for k, v in local.pairings : v.acceptor_region if v.requestor_region == region] }
+  vm_list              = yamldecode(file("${get_terragrunt_dir()}/../shared/oci-config/vms.yaml")).vms
+  vms_by_region        = { for region in local.regions_list : region => { for vm in local.vm_list : vm.name => vm if vm.region == region } }
 }
 
 generate "modules" {
@@ -40,6 +42,7 @@ generate "modules" {
     region_cidrs         = local.region_cidrs,
     acceptors_by_region  = local.acceptors_by_region,
     requestors_by_region = local.requestors_by_region,
+    vms_by_region        = local.vms_by_region,
     terragrunt_dir       = get_terragrunt_dir()
   })
 }

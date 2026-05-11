@@ -2,7 +2,7 @@ locals {
   regions_list   = tolist(yamldecode(file("${local.terragrunt_dir}/config/oci-config/regions.yaml")))
   regions        = toset(local.regions_list)
   sorted_regions = sort(local.regions_list)
-  base_cidr = "10.0.0.0/8"
+  base_cidr      = "10.0.0.0/8"
   region_cidrs = {
     for idx, region in local.regions_list :
     region => cidrsubnet(local.base_cidr, 8, idx)
@@ -40,7 +40,7 @@ locals {
     }
   }
   vm_list = yamldecode(file("${local.terragrunt_dir}/config/oci-config/vms.yaml")).vms
-  vms = { for vm in local.vm_list : vm.name => vm }
+  vms     = { for vm in local.vm_list : vm.name => vm }
   vms_by_region = {
     for region in local.regions_list :
     region => {
@@ -49,7 +49,7 @@ locals {
       if vm.region == region
     }
   }
-  firewall_config = yamldecode(file("${local.terragrunt_dir}/config/oci-config/firewall.yaml")).rules
+  firewall_config = yamldecode(file("${local.terragrunt_dir}/config/oci-config/firewall-node.yaml")).rules
   firewall_rules = flatten([
     for rule in local.firewall_config : [
       for role in rule.for_roles : {
@@ -68,12 +68,12 @@ locals {
   nodes_with_ips = {
     for name, vm in local.vms :
     name => {
-      name        = name
-      role        = vm.type
-      region      = vm.region
-      provider_id = local.all_instance_ids[name]
-      public_ipv6 = local.all_public_ipv6s[name]
-      public_ipv4 = local.all_public_ipv4s[name]
+      name             = name
+      role             = vm.type
+      region           = vm.region
+      provider_id      = local.all_instance_ids[name]
+      public_ipv6      = local.all_public_ipv6s[name]
+      public_ipv4      = local.all_public_ipv4s[name]
       compartment_ocid = local.region_ocids[vm.region].compartment_ocid
     }
   }

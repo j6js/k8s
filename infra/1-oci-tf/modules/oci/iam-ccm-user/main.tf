@@ -55,13 +55,13 @@ resource "oci_identity_api_key" "ccm" {
 
 locals {
   ccm_secret = {
-    "OCI_USER_OCID"    = oci_identity_user.ccm.id
-    "OCI_FINGERPRINT"  = oci_identity_api_key.ccm.fingerprint
-    "OCI_TENANCY_OCID" = var.tenancy_ocid
-    "OCI_REGION"       = var.region
-    "OCI_PRIVATE_KEY"  = tls_private_key.ccm.private_key_pem
-    "OCI_SUBNET_OCID"  = var.subnet_ocid
+    "OCI_USER_OCID"        = oci_identity_user.ccm.id
+    "OCI_FINGERPRINT"      = oci_identity_api_key.ccm.fingerprint
+    "OCI_TENANCY_OCID"     = var.tenancy_ocid
+    "OCI_REGION"           = var.region
+    "OCI_PRIVATE_KEY"      = tls_private_key.ccm.private_key_pem
+    "OCI_SUBNET_OCID"      = var.subnet_ocid
     "OCI_COMPARTMENT_OCID" = var.compartment_ocid
-    "OCI_VCN_OCID" = var.vcn_ocid
+    "OCI_VCN_OCID"         = var.vcn_ocid
   }
 }

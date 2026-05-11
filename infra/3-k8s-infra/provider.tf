@@ -16,6 +16,10 @@ terraform {
         source  = "gavinbunney/kubectl"
         version = "1.19.0"
       }
+      cloudflare = {
+        source  = "cloudflare/cloudflare"
+        version = "5.19.1"
+      }
     }
 }
 
@@ -30,4 +34,8 @@ provider "helm" {
   kubernetes = {
     config_path = "${path.module}/config/outputs/kubeconfig"
   }
+}
+
+provider "cloudflare" {
+  api_token = data.sops_file.cloudflare.data["apiToken"]
 }
