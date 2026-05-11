@@ -39,7 +39,7 @@ locals {
       tenancy_ocid             = data.sops_file.oci_creds_regional[region].data["tenancy_ocid"]
     }
   }
-  vm_list = yamldecode(file("${local.terragrunt_dir}/config/oci-config/vms.yaml")).vms
+  vm_list = yamldecode(file("${local.terragrunt_dir}/../shared/oci-config/vms.yaml")).vms
   vms     = { for vm in local.vm_list : vm.name => vm }
   vms_by_region = {
     for region in local.regions_list :
@@ -49,7 +49,7 @@ locals {
       if vm.region == region
     }
   }
-  firewall_config = yamldecode(file("${local.terragrunt_dir}/config/oci-config/firewall-node.yaml")).rules
+  firewall_config = yamldecode(file("${local.terragrunt_dir}/../shared/oci-config/firewall-node.yaml")).rules
   firewall_rules = flatten([
     for rule in local.firewall_config : [
       for role in rule.for_roles : {

@@ -48,7 +48,6 @@ resource "oci_network_load_balancer_network_load_balancer" "ingress" {
   subnet_id                      = var.subnet_id
   nlb_ip_version                 = "IPV4_AND_IPV6"
   is_private                     = false
-  is_preserve_source_destination = false
 
   reserved_ips {
     id = oci_core_ipv6.nlb_ipv6.id
@@ -65,7 +64,6 @@ resource "oci_network_load_balancer_backend_set" "ipv4" {
   network_load_balancer_id = oci_network_load_balancer_network_load_balancer.ingress.id
   policy                   = "FIVE_TUPLE"
   ip_version               = "IPV4"
-  is_preserve_source       = true
 
   health_checker {
     protocol           = "TCP"
@@ -82,7 +80,6 @@ resource "oci_network_load_balancer_backend_set" "ipv6" {
   network_load_balancer_id = oci_network_load_balancer_network_load_balancer.ingress.id
   policy                   = "FIVE_TUPLE"
   ip_version               = "IPV6"
-  is_preserve_source       = true
 
   health_checker {
     protocol           = "TCP"

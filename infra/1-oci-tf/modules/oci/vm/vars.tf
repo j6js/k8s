@@ -39,12 +39,13 @@ variable "image_id" {
 }
 variable "vms" {
   type = map(object({
-    name   = string
-    type   = string
-    cpu    = number
-    ram    = number
-    disk   = number
-    region = string
+    name         = string
+    type         = string
+    cpu          = number
+    ram          = number
+    disk         = number
+    region       = string
+    fault_domain = number
   }))
   description = "Map of VM configs keyed by name, from vms.yaml"
 }

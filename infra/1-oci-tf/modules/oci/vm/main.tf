@@ -2,6 +2,10 @@ data "oci_identity_availability_domains" "this" {
   compartment_id = var.tenancy_ocid
 }
 
+data "oci_identity_fault_domains" "this" {
+    availability_domain = data.oci_identity_availability_domains.this.availability_domains[0].name
+    compartment_id = var.compartment_ocid
+}
 locals {
   roles = ["cp", "sh", "wk"]
 
@@ -144,6 +148,7 @@ resource "oci_core_instance" "vm" {
   compartment_id                      = var.compartment_ocid
   display_name                        = each.key
   availability_domain                 = data.oci_identity_availability_domains.this.availability_domains[0].name
+  fault_domain                        = data.oci_identity_fault_domains.this.fault_domains[each.value.fault_domain - 1].name
   shape                               = var.shape
   is_pv_encryption_in_transit_enabled = true
 

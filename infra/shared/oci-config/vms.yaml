@@ -11,33 +11,39 @@ vms:
       ram: 8
       disk: 65
       region: ap-sydney-1
+      fault_domain: 1
     - name: syd-sh1
       type: sh
       cpu: 1
       ram: 8
       disk: 65
       region: ap-sydney-1
-    - name: syd-wk1
-      type: wk
-      cpu: 1
-      ram: 8
-      disk: 65
-      region: ap-sydney-1
-    - name: mel-cp1
-      type: cp
-      cpu: 1
-      ram: 8
-      disk: 65
-      region: ap-melbourne-1
-    - name: mel-sh1
+      fault_domain: 2
+    - name: syd-sh2
       type: sh
       cpu: 1
       ram: 8
       disk: 65
-      region: ap-melbourne-1
+      region: ap-sydney-1
+      fault_domain: 3
     - name: mel-wk1
       type: wk
       cpu: 1
       ram: 8
       disk: 65
       region: ap-melbourne-1
+      fault_domain: 1
+    - name: mel-wk2
+      type: wk
+      cpu: 1
+      ram: 8
+      disk: 65
+      region: ap-melbourne-1
+      fault_domain: 2
+    - name: mel-wk3
+      type: wk
+      cpu: 1
+      ram: 8
+      disk: 65
+      region: ap-melbourne-1
+      fault_domain: 3
