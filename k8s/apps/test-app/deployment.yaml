@@ -13,8 +13,17 @@ spec:
       labels:
         app: test-app
     spec:
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: nginx
-          image: nginx:latest
+          image: nginxinc/nginx-unprivileged:latest
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsNonRoot: true
           ports:
-            - containerPort: 80
+            - containerPort: 8080
