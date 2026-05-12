@@ -3,15 +3,8 @@ kind: Gateway
 metadata:
   name: envoy-gw
   namespace: test-app
-  annotations:
-    "io.cilium/lb-ipam-ips": ""
 spec:
   gatewayClassName: envoy
-  addresses:
-  - type: IPAddress
-    value: "::"
-  - type: IPAddress
-    value: "0.0.0.0"
   listeners:
   - name: http
     protocol: HTTP

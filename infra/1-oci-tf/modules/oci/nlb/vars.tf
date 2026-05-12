@@ -36,12 +36,12 @@ variable "listeners" {
   default = {
     http = {
       listener_port = 80
-      backend_port  = 80
+      backend_port  = 30080
       protocol      = "TCP"
     }
     https = {
       listener_port = 443
-      backend_port  = 443
+      backend_port  = 30443
       protocol      = "TCP"
     }
   }

@@ -8,3 +8,16 @@ spec:
     type: Kubernetes
     kubernetes:
       envoyDaemonSet: {}
+      envoyService:
+        type: NodePort
+        patch:
+          type: StrategicMerge
+          value:
+            spec:
+              ports:
+                - name: http-80
+                  port: 80
+                  nodePort: 30080
+                - name: https-443
+                  port: 443
+                  nodePort: 30443
