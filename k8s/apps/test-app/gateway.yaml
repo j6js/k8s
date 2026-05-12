@@ -3,6 +3,8 @@ kind: Gateway
 metadata:
   name: cilium-gw
   namespace: test-app
+  annotations:
+    "io.cilium/lb-ipam-ips": ""
 spec:
   gatewayClassName: cilium
   addresses:

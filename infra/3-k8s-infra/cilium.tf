@@ -30,6 +30,10 @@ resource "helm_release" "cilium" {
       value = "true"
     },
     {
+      name  = "gatewayAPI.service.type"
+      value = "NodePort"
+    },
+    {
       name  = "gatewayAPI.deployment.kind"
       value = "DaemonSet"
     },
