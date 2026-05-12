@@ -7,7 +7,7 @@ spec:
   interval: 5m
   releaseName: eg
   chartRef:
-    kind: OCIRepository
+    kind: HelmChart
     name: envoy-gateway
   upgrade:
     strategy:
