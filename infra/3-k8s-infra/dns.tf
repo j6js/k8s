@@ -1,5 +1,5 @@
 locals {
-    nlb_info = jsondecode(file("${path.module}/config/outputs/1-oci-tf.json")).nlb_ingress
+    node_info = jsondecode(file("${path.module}/config/outputs/1-oci-tf.json")).nodes
     base_domain = yamldecode(file("${path.module}/config/dns.yaml")).baseDomain
 }
 
@@ -53,8 +53,9 @@ resource "kubernetes_secret_v1" "cloudflare_api_token" {
     apiKey = data.sops_file.cloudflare.data["apiToken"]
   }
 }
-resource "kubectl_manifest" "regional_dns_endpoint" {
-  for_each = local.nlb_info
+
+resource "kubectl_manifest" "global_dns_endpoint" {
+  for_each = { for n in local.node_info : n.name => n }
   yaml_body = yamlencode({
     apiVersion = "externaldns.k8s.io/v1alpha1"
     kind       = "DNSEndpoint"
@@ -68,31 +69,6 @@ resource "kubectl_manifest" "regional_dns_endpoint" {
                 dnsName = "${each.key}.hl.${local.base_domain}"
                 recordType = "A"
                 targets = [each.value.public_ipv4]
-            },
-            {
-                dnsName = "${each.key}.hl.${local.base_domain}"
-                recordType = "AAAA"
-                targets = [each.value.public_ipv6]
-            }
-        ]
-    }
-  })
-  depends_on = [helm_release.external_dns]
-}
-resource "kubectl_manifest" "global_dns_endpoint" {
-  yaml_body = yamlencode({
-    apiVersion = "externaldns.k8s.io/v1alpha1"
-    kind       = "DNSEndpoint"
-    metadata = {
-      name      = "dns-global"
-      namespace = "external-dns"
-    }
-    spec = {
-        endpoints = [
-            for nlb, info in local.nlb_info : {
-                dnsName = "hl.${local.base_domain}"
-                recordType = "CNAME"
-                targets = ["${nlb}.hl.${local.base_domain}"]
             }
         ]
     }

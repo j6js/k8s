@@ -1,9 +1,14 @@
+data "oci_core_vcn" "this" {
+  vcn_id = var.vcn_id
+}
+
 locals {
   active_backends = {
     for name, backend in var.backends : name => backend
     if contains(var.backend_roles, backend.role)
   }
   internet_cidrs = toset(["0.0.0.0/0", "::/0"])
+  vcn_cidrs      = toset(concat(data.oci_core_vcn.this.cidr_blocks, data.oci_core_vcn.this.ipv6cidr_blocks))
 
   ipv4_listener_keys = var.enable_ipv4_backends ? var.listeners : {}
   ipv6_listener_keys = var.enable_ipv6_backends ? var.listeners : {}
@@ -65,7 +70,7 @@ resource "oci_core_network_security_group_security_rule" "nlb_ingress" {
 
 resource "oci_core_network_security_group_security_rule" "nlb_egress" {
   for_each = {
-    for item in setproduct(keys(var.listeners), local.internet_cidrs) :
+    for item in setproduct(keys(var.listeners), ["10.0.0.0/8"]) :
     "${item[0]}-${replace(item[1], "/", "_")}" => {
       listener = var.listeners[item[0]]
       cidr     = item[1]

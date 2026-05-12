@@ -1,9 +1,44 @@
+resource "oci_core_security_list" "sl" {
+  compartment_id = var.compartment_ocid
+  vcn_id         = var.vcn_id
+
+  ingress_security_rules {
+    protocol = "6"
+    source   = "0.0.0.0/0"
+    tcp_options {
+      min = 80
+      max = 80
+    }
+  }
+  ingress_security_rules {
+    protocol = "6"
+    source   = "0.0.0.0/0"
+    tcp_options {
+      min = 443
+      max = 443
+    }
+  }
+  ingress_security_rules {
+    protocol = "6"
+    source   = "0.0.0.0/0"
+    tcp_options {
+      min = 30000
+      max = 32767
+    }
+  }
+  egress_security_rules {
+    protocol    = "all"
+    destination = "0.0.0.0/0"
+  }
+}
+
 resource "oci_core_subnet" "subnet" {
-  compartment_id  = var.compartment_ocid
-  vcn_id          = var.vcn_id
-  ipv4cidr_blocks = [cidrsubnet(var.priv_ipv4_cidr, 8, 1)]
-  ipv6cidr_blocks = [cidrsubnet(var.current_ipv6_cidr, 8, 1)]
-  route_table_id  = oci_core_route_table.rt.id
+  compartment_id    = var.compartment_ocid
+  vcn_id            = var.vcn_id
+  ipv4cidr_blocks   = [cidrsubnet(var.priv_ipv4_cidr, 8, 1)]
+  ipv6cidr_blocks   = [cidrsubnet(var.current_ipv6_cidr, 8, 1)]
+  route_table_id    = oci_core_route_table.rt.id
+  security_list_ids = [oci_core_security_list.sl.id]
 }
 
 resource "oci_core_route_table" "rt" {

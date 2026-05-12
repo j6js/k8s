@@ -1,18 +1,9 @@
 rules:
-  - name: nlb-health-check
-    description: "Allow NLB health checks to reach backend nodes"
+  - name: nlb-backend-traffic
+    description: "Allow health checks and traffic from NLB to backend services"
     direction: ingress
     protocol: tcp
     ports: [30080, 30443]
     source: internet
-    destination: ""
-    for_roles: [cp, sh, wk]
-
-  - name: nlb-backend-traffic
-    description: "Allow traffic from NLB to backend services"
-    direction: ingress
-    protocol: tcp
-    ports: [30080, 30443]
-    source: all_vcns
     destination: ""
     for_roles: [cp, sh, wk]
