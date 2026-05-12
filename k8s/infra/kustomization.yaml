@@ -3,4 +3,4 @@ kind: Kustomization
 resources:
   - vault
   - longhorn
-  - nginx-gateway-fabric
+  - envoy-gateway
