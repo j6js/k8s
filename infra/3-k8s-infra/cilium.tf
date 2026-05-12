@@ -22,22 +22,6 @@ resource "helm_release" "cilium" {
       value = "7445"
     },
     {
-      name  = "gatewayAPI.enabled"
-      value = "true"
-    },
-    {
-      name  = "gatewayAPI.hostNetwork.enabled"
-      value = "true"
-    },
-    {
-      name  = "gatewayAPI.service.type"
-      value = "NodePort"
-    },
-    {
-      name  = "gatewayAPI.deployment.kind"
-      value = "DaemonSet"
-    },
-    {
       name = "securityContext.capabilities.ciliumAgent"
       value = "{CHOWN,KILL,NET_ADMIN,NET_RAW,IPC_LOCK,SYS_ADMIN,SYS_RESOURCE,DAC_OVERRIDE,FOWNER,SETGID,SETUID}"
     },
