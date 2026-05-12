@@ -9,7 +9,3 @@ spec:
     spec:
       chart: "oci://ghcr.io/nginx/charts/nginx-gateway-fabric"
       version: "2.6.0"
-  values:
-    nginxGatewayFabric:
-      service:
-        type: LoadBalancer
