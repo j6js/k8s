@@ -24,4 +24,16 @@ spec:
                       operator: Exists
                       effect: NoSchedule
       envoyService:
-        type: ClusterIP
+        type: NodePort
+        externalTrafficPolicy: Cluster
+        patch:
+          type: StrategicMerge
+          value:
+            spec:
+              ports:
+                - name: http
+                  port: 80
+                  nodePort: 80
+                - name: https
+                  port: 443
+                  nodePort: 443
