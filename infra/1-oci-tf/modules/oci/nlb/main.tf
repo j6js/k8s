@@ -3,6 +3,7 @@ locals {
     for name, backend in var.backends : name => backend
     if contains(var.backend_roles, backend.role)
   }
+  internet_cidrs = toset(["0.0.0.0/0", "::/0"])
 
   ipv4_listener_keys = var.enable_ipv4_backends ? var.listeners : {}
   ipv6_listener_keys = var.enable_ipv6_backends ? var.listeners : {}
@@ -32,6 +33,60 @@ locals {
   ]...)
 }
 
+resource "oci_core_network_security_group" "nlb" {
+  compartment_id = var.compartment_id
+  vcn_id         = var.vcn_id
+  display_name   = "nsg-ingress-nlb-${var.region}"
+}
+
+resource "oci_core_network_security_group_security_rule" "nlb_ingress" {
+  for_each = {
+    for item in setproduct(keys(var.listeners), local.internet_cidrs) :
+    "${item[0]}-${replace(item[1], "/", "_")}" => {
+      listener = var.listeners[item[0]]
+      cidr     = item[1]
+    }
+  }
+
+  network_security_group_id = oci_core_network_security_group.nlb.id
+  description               = "Allow public ingress to ${each.key}"
+  direction                 = "INGRESS"
+  protocol                  = "6"
+  source_type               = "CIDR_BLOCK"
+  source                    = each.value.cidr
+
+  tcp_options {
+    destination_port_range {
+      min = each.value.listener.listener_port
+      max = each.value.listener.listener_port
+    }
+  }
+}
+
+resource "oci_core_network_security_group_security_rule" "nlb_egress" {
+  for_each = {
+    for item in setproduct(keys(var.listeners), local.internet_cidrs) :
+    "${item[0]}-${replace(item[1], "/", "_")}" => {
+      listener = var.listeners[item[0]]
+      cidr     = item[1]
+    }
+  }
+
+  network_security_group_id = oci_core_network_security_group.nlb.id
+  description               = "Allow NLB egress to ${each.key} backends"
+  direction                 = "EGRESS"
+  protocol                  = "6"
+  destination_type          = "CIDR_BLOCK"
+  destination               = each.value.cidr
+
+  tcp_options {
+    destination_port_range {
+      min = each.value.listener.backend_port
+      max = each.value.listener.backend_port
+    }
+  }
+}
+
 resource "oci_core_ipv6" "nlb_ipv6" {
   subnet_id = var.subnet_id
   lifetime  = "RESERVED"
@@ -43,11 +98,12 @@ resource "oci_core_public_ip" "nlb_ipv4" {
 }
 
 resource "oci_network_load_balancer_network_load_balancer" "ingress" {
-  compartment_id                 = var.compartment_id
-  display_name                   = "ingress-nlb-${var.region}"
-  subnet_id                      = var.subnet_id
-  nlb_ip_version                 = "IPV4_AND_IPV6"
-  is_private                     = false
+  compartment_id             = var.compartment_id
+  display_name               = "ingress-nlb-${var.region}"
+  subnet_id                  = var.subnet_id
+  nlb_ip_version             = "IPV4_AND_IPV6"
+  is_private                 = false
+  network_security_group_ids = [oci_core_network_security_group.nlb.id]
 
   reserved_ips {
     id = oci_core_ipv6.nlb_ipv6.id
@@ -64,6 +120,7 @@ resource "oci_network_load_balancer_backend_set" "ipv4" {
   network_load_balancer_id = oci_network_load_balancer_network_load_balancer.ingress.id
   policy                   = "FIVE_TUPLE"
   ip_version               = "IPV4"
+  is_preserve_source       = false
 
   health_checker {
     protocol           = "TCP"
@@ -80,6 +137,7 @@ resource "oci_network_load_balancer_backend_set" "ipv6" {
   network_load_balancer_id = oci_network_load_balancer_network_load_balancer.ingress.id
   policy                   = "FIVE_TUPLE"
   ip_version               = "IPV6"
+  is_preserve_source       = false
 
   health_checker {
     protocol           = "TCP"

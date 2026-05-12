@@ -29,9 +29,9 @@ spec:
           value:
             spec:
               ports:
-                - name: http-80
+                - name: http
                   port: 80
                   nodePort: 30080
-                - name: https-443
+                - name: https
                   port: 443
                   nodePort: 30443

@@ -11,10 +11,16 @@ variable "subnet_id" {
   type        = string
 }
 
+variable "vcn_id" {
+  description = "The OCID of the VCN in which to create the network load balancer NSG."
+  type        = string
+}
+
 variable "backends" {
   description = "Regional backend nodes keyed by node name."
   type = map(object({
     private_ipv4 = string
+    public_ipv4  = string
     public_ipv6  = string
     role         = string
   }))
@@ -39,11 +45,6 @@ variable "listeners" {
       backend_port  = 30080
       protocol      = "TCP"
     }
-    https = {
-      listener_port = 443
-      backend_port  = 30443
-      protocol      = "TCP"
-    }
   }
 }
 
@@ -56,5 +57,5 @@ variable "enable_ipv4_backends" {
 variable "enable_ipv6_backends" {
   description = "Create IPv6 backend sets, listeners, and backend registrations."
   type        = bool
-  default     = true
+  default     = false
 }
