@@ -1,12 +1,12 @@
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
-  name: cilium-gw
+  name: envoy-gw
   namespace: test-app
   annotations:
     "io.cilium/lb-ipam-ips": ""
 spec:
-  gatewayClassName: cilium
+  gatewayClassName: envoy
   addresses:
   - type: IPAddress
     value: "::"
@@ -27,7 +27,7 @@ metadata:
   namespace: test-app
 spec:
   parentRefs:
-  - name: cilium-gw
+  - name: envoy-gw
   rules:
   - matches:
     - path:

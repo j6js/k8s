@@ -1,0 +1,10 @@
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: EnvoyProxy
+metadata:
+  name: daemonset-proxy
+  namespace: envoy-gateway
+spec:
+  provider:
+    type: Kubernetes
+    kubernetes:
+      envoyDaemonSet: {}
