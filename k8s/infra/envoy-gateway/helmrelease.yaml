@@ -8,7 +8,7 @@ spec:
   releaseName: eg
   chartRef:
     kind: OCIRepository
-    name: gateway-helm
+    name: envoy-gateway
   upgrade:
     strategy:
       name: RetryOnFailure
