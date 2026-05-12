@@ -2,10 +2,13 @@ apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: nginx-gateway-fabric
-  namespace: kube-system
+  namespace: nginx-gateway
 spec:
   interval: 10m
   chart:
     spec:
-      chart: "oci://ghcr.io/nginx/charts/nginx-gateway-fabric"
+      chart: nginx-gateway-fabric
       version: "2.6.0"
+      sourceRef:
+        kind: HelmRepository
+        name: nginx-gateway-fabric
