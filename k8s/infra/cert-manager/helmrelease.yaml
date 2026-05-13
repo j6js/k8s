@@ -19,7 +19,8 @@ spec:
       name: RetryOnFailure
       retryInterval: 5m
   values:
-    crds:
-      enabled: true
+    installCRDs: true
     config:
       enableGatewayAPI: true
+      apiVersion: "controller.config.cert-manager.io/v1alpha1"
+      kind: ControllerConfiguration
