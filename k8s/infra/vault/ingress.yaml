@@ -5,7 +5,7 @@ metadata:
   namespace: vault
 spec:
   endpoints:
-    - dnsName: "vault."
+    - dnsName: "vault.j6js.com"
       recordType: "CNAME"
       targets:
         - "hl.j6js.com"
