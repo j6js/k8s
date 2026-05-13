@@ -109,14 +109,6 @@ resource "oci_network_load_balancer_network_load_balancer" "ingress" {
   nlb_ip_version             = "IPV4_AND_IPV6"
   is_private                 = false
   network_security_group_ids = [oci_core_network_security_group.nlb.id]
-
-  reserved_ips {
-    id = oci_core_ipv6.nlb_ipv6.id
-  }
-
-  reserved_ips {
-    id = oci_core_public_ip.nlb_ipv4.id
-  }
 }
 
 resource "oci_network_load_balancer_backend_set" "ipv4" {
