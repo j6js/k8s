@@ -92,16 +92,6 @@ resource "oci_core_network_security_group_security_rule" "nlb_egress" {
   }
 }
 
-resource "oci_core_ipv6" "nlb_ipv6" {
-  subnet_id = var.subnet_id
-  lifetime  = "RESERVED"
-}
-
-resource "oci_core_public_ip" "nlb_ipv4" {
-  compartment_id = var.compartment_id
-  lifetime       = "RESERVED"
-}
-
 resource "oci_network_load_balancer_network_load_balancer" "ingress" {
   compartment_id             = var.compartment_id
   display_name               = "ingress-nlb-${var.region}"
