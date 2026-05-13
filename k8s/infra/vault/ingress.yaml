@@ -61,5 +61,5 @@ spec:
             type: PathPrefix
             value: /
       backendRefs:
-        - name: vault-svc
+        - name: vault
           port: 8200
