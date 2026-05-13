@@ -4,4 +4,4 @@ resources:
   - vault
   - longhorn
   - envoy-gateway
-  - cert-manager
+  #- cert-manager
