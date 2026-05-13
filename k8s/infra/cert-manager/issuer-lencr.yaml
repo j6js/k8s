@@ -10,8 +10,8 @@ spec:
     privateKeySecretRef:
       name: lencr-account-key
     solvers:
-      - http01:
-          gatewayHTTPRoute:
-            parentRefs:
-              - name: eg
-                namespace: default
+      - dns01:
+          cloudflare:
+            apiTokenSecretRef:
+              name: cert-manager-cf-api
+              key: api-token
