@@ -18,3 +18,8 @@ spec:
     strategy:
       name: RetryOnFailure
       retryInterval: 5m
+  values:
+    crds:
+      enabled: true
+    config:
+      enableGatewayAPI: true
