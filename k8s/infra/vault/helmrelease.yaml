@@ -16,6 +16,7 @@ spec:
       interval: 1h
   values:
     server:
+      logLevel: debug
       dataStorage:
         enabled: true
         storageClass: longhorn

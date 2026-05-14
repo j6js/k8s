@@ -1,0 +1,29 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: rook-ceph-release
+  namespace: rook-ceph
+spec:
+  install:
+    createNamespace: false
+  chart:
+    spec:
+      chart: rook-ceph
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: HelmRepository
+        name: rook-repo
+      version: v1.15.2
+  interval: 1m0s
+  values:
+    operator:
+      tolerations:
+        - key: "node-role.kubernetes.io/controlplane"
+          operator: "Exists"
+          effect: "NoSchedule"
+        - key: "node-role.kubernetes.io/controlplane"
+          operator: "Exists"
+          effect: "NoExecute"
+    csi:
+      enableCephfs: true
+      enableRbd: true
