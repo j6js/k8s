@@ -29,7 +29,7 @@ resource "helm_release" "flux_operator" {
     repository = "oci://ghcr.io/controlplaneio-fluxcd/charts"
     chart      = "flux-operator"
     namespace  = "flux-system"
-    version    = "0.48.0"
+    version    = "0.49.0"
     depends_on = [
         kubernetes_namespace_v1.flux_system,
         kubernetes_secret_v1.flux_sops_secret,
