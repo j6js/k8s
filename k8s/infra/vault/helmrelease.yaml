@@ -15,15 +15,15 @@ spec:
         namespace: vault
       interval: 1h
   values:
+    injector:
+      enabled: true
+      replicas: 3
     server:
       dataStorage:
         enabled: true
         storageClass: longhorn
       standalone:
         enabled: false
-      injector:
-        enabled: true
-        replicas: 3
       ha:
         enabled: true
         replicas: 3
