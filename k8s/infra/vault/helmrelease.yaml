@@ -21,6 +21,9 @@ spec:
         storageClass: longhorn
       standalone:
         enabled: false
+      injector:
+        enabled: true
+        replicas: 3
       ha:
         enabled: true
         replicas: 3

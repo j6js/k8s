@@ -22,22 +22,29 @@ patches:
         net.ipv4.conf.all.rp_filter: "0"
         net.ipv4.conf.default.rp_filter: "0"
 
-schematic:
-  customization:
-    systemExtensions:
-      officialExtensions:
-        - siderolabs/iscsi-tools
-        - siderolabs/util-linux-tools
-
-talosVersion: v1.13.0
-
-additionalApiServerCertSans:
-  - "${cluster_endpoint}"
-%{ for name, node in nodes ~}
-  - "${node.public_ipv6}"
-%{ endfor ~}
+worker:
+  schematic: &default_schematic
+    customization:
+      systemExtensions:
+        officialExtensions:
+          - siderolabs/iscsi-tools
+          - siderolabs/util-linux-tools
+  patches:
+    - |-
+      machine:
+        network:
+          nameservers:
+            - 1.1.1.1
+            - 1.0.0.1
+            - 2606:4700:4700::1111
+            - 2606:4700:4700::1001
+        time:
+          servers:
+            - time.cloudflare.com
+            - pool.ntp.org
 
 controlPlane:
+  schematic: *default_schematic
   patches:
     - |-
       machine:
@@ -55,20 +62,14 @@ controlPlane:
             - interface: eth0
               dhcp: true
 
-worker:
-  patches:
-    - |-
-      machine:
-        network:
-          nameservers:
-            - 1.1.1.1
-            - 1.0.0.1
-            - 2606:4700:4700::1111
-            - 2606:4700:4700::1001
-        time:
-          servers:
-            - time.cloudflare.com
-            - pool.ntp.org
+talosVersion: v1.13.0
+
+additionalApiServerCertSans:
+  - "${cluster_endpoint}"
+%{ for name, node in nodes ~}
+  - "${node.public_ipv6}"
+%{ endfor ~}
+
 nodes:
 %{ for name, node in nodes ~}
 %{ if node.role == "cp" ~}
