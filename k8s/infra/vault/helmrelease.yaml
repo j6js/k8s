@@ -15,9 +15,6 @@ spec:
         namespace: vault
       interval: 1h
   values:
-    injector:
-      enabled: true
-      replicas: 3
     server:
       dataStorage:
         enabled: true
@@ -89,4 +86,7 @@ spec:
 
       extraVolumes:
         - type: secret
+          name: vault-oci-kms
+      initVolumeMounts:
+        - mountPath: /vault/userconfig/vault-oci-kms
           name: vault-oci-kms
