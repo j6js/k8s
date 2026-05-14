@@ -19,7 +19,7 @@ spec:
       logLevel: debug
       dataStorage:
         enabled: true
-        storageClass: longhorn
+        storageClass: rook-cephfs
       standalone:
         enabled: false
       ha:

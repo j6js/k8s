@@ -1,0 +1,72 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: rook-ceph-cluster
+  namespace: rook-ceph
+spec:
+  dependsOn:
+    - name: rook-ceph-release
+      namespace: rook-ceph
+  install:
+    createNamespace: false
+  chart:
+    spec:
+      chart: rook-ceph-cluster
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: HelmRepository
+        name: rook-repo
+      version: v1.15.2
+  interval: 1m0s
+  values:
+    operatorNamespace: rook-ceph
+    cephClusterSpec:
+      cephVersion:
+        image: quay.io/ceph/ceph:v18.2.4
+      dataDirHostPath: /var/lib/rook
+      mon:
+        count: 3
+        allowMultiplePerNode: true
+      dashboard:
+        enabled: true
+      monitoring:
+        enabled: false
+      network:
+        provider: host
+      crashCollector:
+        disable: true
+      storage:
+        useAllNodes: true
+        useAllDevices: false
+        config:
+          databaseSizeMB: "1024"
+          journalSizeMB: "1024"
+    cephFileSystems:
+      - name: myfs
+        spec:
+          metadataPool:
+            replicated:
+              size: 1
+          dataPools:
+            - replicated:
+                size: 1
+          preserveFilesystemOnDelete: true
+          metadataServer:
+            activeCount: 1
+            activeStandby: false
+    cephBlockPools:
+      - name: replicapool
+        spec:
+          replication:
+            size: 1
+    storageClass:
+      cephfs:
+        - name: rook-cephfs
+          reclaimPolicy: Retain
+          allowVolumeExpansion: true
+          pool: myfs-data
+      rbd:
+        - name: rook-ceph-block
+          reclaimPolicy: Retain
+          allowVolumeExpansion: true
+          pool: replicapool
