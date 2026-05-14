@@ -16,13 +16,13 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: rook-repo
-      version: v1.15.2
+      version: v1.19.5
   interval: 1m0s
   values:
     operatorNamespace: rook-ceph
     cephClusterSpec:
       cephVersion:
-        image: quay.io/ceph/ceph:v18.2.4
+        image: quay.io/ceph/ceph:v20.2.1
       dataDirHostPath: /var/lib/rook
       mon:
         count: 3

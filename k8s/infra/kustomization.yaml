@@ -5,4 +5,5 @@ resources:
   - rook-operator
   - rook-cluster
   - envoy-gateway
+  - gatewayapi
   - cert-manager
