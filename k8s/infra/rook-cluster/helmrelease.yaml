@@ -61,12 +61,14 @@ spec:
             size: 1
     storageClass:
       cephfs:
-        - name: rook-cephfs
-          reclaimPolicy: Retain
-          allowVolumeExpansion: true
-          pool: myfs-data
+        enabled: true
+        name: rook-cephfs
+        reclaimPolicy: Retain
+        allowVolumeExpansion: true
+        pool: myfs-data0
       rbd:
-        - name: rook-ceph-block
-          reclaimPolicy: Retain
-          allowVolumeExpansion: true
-          pool: replicapool
+        enabled: true
+        name: rook-ceph-block
+        reclaimPolicy: Retain
+        allowVolumeExpansion: true
+        pool: replicapool
