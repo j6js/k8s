@@ -3,4 +3,6 @@ kind: Kustomization
 resources:
   - helmrelease.yaml
   - helmrepository.yaml
+  - gatewayclass.yaml
+  - envoyproxy.yaml
   - namespace.yaml
