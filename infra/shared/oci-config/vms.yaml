@@ -5,45 +5,31 @@
 # disk: int # OS Disk size in GB
 # region: string # OCI region to create the VM in, e.g. ap-sydney-1, ap-melbourne-1
 vms:
-    - name: syd-cp1
-      type: cp
-      cpu: 1
-      ram: 8
-      disk: 65
-      region: ap-sydney-1
-      fault_domain: 1
     - name: syd-sh1
       type: sh
-      cpu: 1
-      ram: 8
-      disk: 65
+      cpu: 2
+      ram: 12
+      disk: 100
       region: ap-sydney-1
-      fault_domain: 2
+      fault_domain: 1
     - name: syd-sh2
       type: sh
-      cpu: 1
-      ram: 8
-      disk: 65
+      cpu: 2
+      ram: 12
+      disk: 100
       region: ap-sydney-1
-      fault_domain: 3
-    - name: mel-wk1
-      type: wk
-      cpu: 1
-      ram: 8
-      disk: 65
+      fault_domain: 2
+    - name: mel-sh1
+      type: sh
+      cpu: 2
+      ram: 12
+      disk: 100
       region: ap-melbourne-1
       fault_domain: 1
-    - name: mel-wk2
-      type: wk
-      cpu: 1
-      ram: 8
-      disk: 65
+    - name: mel-sh2
+      type: sh
+      cpu: 2
+      ram: 12
+      disk: 100
       region: ap-melbourne-1
       fault_domain: 2
-    - name: mel-wk3
-      type: wk
-      cpu: 1
-      ram: 8
-      disk: 65
-      region: ap-melbourne-1
-      fault_domain: 3

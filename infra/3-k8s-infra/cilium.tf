@@ -2,7 +2,7 @@ resource "helm_release" "cilium" {
   name       = "cilium"
   namespace  = "kube-system"
   chart      = "oci://quay.io/cilium/charts/cilium"
-  version    = "1.20.0-pre.2"
+  version    = "1.19.4"
 
   set = [
     {

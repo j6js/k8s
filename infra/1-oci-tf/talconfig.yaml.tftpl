@@ -79,21 +79,12 @@ nodes:
     controlPlane: true
     nodeLabels:
       "topology.kubernetes.io/region": "${node.region}"
-      "oci.oraclecloud.com/ip-family-ipv6": "true"
-    nodeAnnotations:
-      "oci.oraclecloud.com/compartment-id": "${node.compartment_ocid}"
     installDisk: /dev/sda
     networkInterfaces:
       - interface: eth0
         dhcp: true
         dhcpOptions:
           ipv6: true
-    patches:
-      - |-
-        machine:
-          kubelet:
-            extraArgs:
-              provider-id: ${node.provider_id}
 
 %{ endif ~}
 %{ endfor ~}
@@ -104,9 +95,6 @@ nodes:
     controlPlane: true
     nodeLabels:
       "topology.kubernetes.io/region": "${node.region}"
-      "oci.oraclecloud.com/ip-family-ipv6": "true"
-    nodeAnnotations:
-      "oci.oraclecloud.com/compartment-id": "${node.compartment_ocid}"
     installDisk: /dev/sda
     networkInterfaces:
       - interface: eth0
@@ -115,10 +103,6 @@ nodes:
           ipv6: true
     patches:
       - |-
-        machine:
-          kubelet:
-            extraArgs:
-              provider-id: ${node.provider_id}
         cluster:
           allowSchedulingOnControlPlanes: true
 
@@ -132,19 +116,10 @@ nodes:
     installDisk: /dev/sda
     nodeLabels:
       "topology.kubernetes.io/region": "${node.region}"
-      "oci.oraclecloud.com/ip-family-ipv6": "true"
-    nodeAnnotations:
-      "oci.oraclecloud.com/compartment-id": "${node.compartment_ocid}"
     networkInterfaces:
       - interface: eth0
         dhcp: true
         dhcpOptions:
           ipv6: true
-    patches:
-      - |-
-        machine:
-          kubelet:
-            extraArgs:
-              provider-id: ${node.provider_id}
 %{ endif ~}
 %{ endfor ~}
