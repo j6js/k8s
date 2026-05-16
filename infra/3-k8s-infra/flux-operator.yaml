@@ -15,6 +15,7 @@ spec:
     - image-reflector-controller
     - image-automation-controller
   cluster:
+    size: small
     type: kubernetes
     multitenant: false
     networkPolicy: true
