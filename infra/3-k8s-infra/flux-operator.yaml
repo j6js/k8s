@@ -30,6 +30,13 @@ spec:
   kustomize:
     patches:
       - patch: |
+          - op: replace
+            path: /spec/prune
+            value: false
+        target:
+          kind: Kustomization
+          name: flux-system
+      - patch: |
           - op: add
             path: /spec/decryption
             value:
