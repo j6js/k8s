@@ -5,6 +5,10 @@ metadata:
   namespace: cnpg-system
 spec:
   interval: 1h
+  install:
+    crds: CreateReplace
+  upgrade:
+    crds: CreateReplace
   chart:
     spec:
       chart: "oci://ghcr.io/cloudnative-pg/charts/cloudnative-pg"

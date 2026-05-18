@@ -6,6 +6,13 @@ metadata:
 spec:
   interval: 5m
   releaseName: eg
+  install:
+    crds: CreateReplace
+  upgrade:
+    crds: CreateReplace
+    strategy:
+      name: RetryOnFailure
+      retryInterval: 5m
   chart:
     spec:
       chart: cert-manager
@@ -14,10 +21,6 @@ spec:
         name: cert-manager
       version: 1.20.2
       interval: 1h
-  upgrade:
-    strategy:
-      name: RetryOnFailure
-      retryInterval: 5m
   values:
     installCRDs: true
     config:
