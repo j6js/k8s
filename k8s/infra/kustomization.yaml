@@ -5,3 +5,5 @@ resources:
   - longhorn
   - envoy-gateway
   - cert-manager
+  - cloudnativepg
+  - external-secrets

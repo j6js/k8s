@@ -1,0 +1,55 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: cnpg-cluster
+  namespace: cnpg-system
+spec:
+  instances: 3
+  storage:
+    size: 10Gi
+  bootstrap:
+    initdb:
+      database: app
+      owner: app
+      postInitSQL:
+        - CREATE ROLE authentik WITH LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT;
+        - CREATE DATABASE authentik OWNER authentik;
+        - REVOKE ALL ON DATABASE authentik FROM PUBLIC;
+        - CREATE ROLE vaultwarden WITH LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT;
+        - CREATE DATABASE vaultwarden OWNER vaultwarden;
+        - REVOKE ALL ON DATABASE vaultwarden FROM PUBLIC;
+        - CREATE ROLE grafana WITH LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT;
+        - CREATE DATABASE grafana OWNER grafana;
+        - REVOKE ALL ON DATABASE grafana FROM PUBLIC;
+  managed:
+    roles:
+      - name: authentik
+        ensure: present
+        comment: Authentik application role
+        login: true
+        superuser: false
+        createdb: false
+        createrole: false
+        inherit: true
+      - name: vaultwarden
+        ensure: present
+        comment: Vaultwarden application role
+        login: true
+        superuser: false
+        createdb: false
+        createrole: false
+        inherit: true
+      - name: grafana
+        ensure: present
+        comment: Grafana application role
+        login: true
+        superuser: false
+        createdb: false
+        createrole: false
+        inherit: true
+  postgresql:
+    parameters:
+      pg_stat_statements.max: "10000"
+      pg_stat_statements.track: all
+  monitoring:
+    enablePodMonitor: true
