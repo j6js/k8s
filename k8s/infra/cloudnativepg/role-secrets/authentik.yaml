@@ -1,4 +1,4 @@
-apiVersion: generators.external-secrets.io/v1alpha1
+apiVersion: generators.external-secrets.io/v1
 kind: Password
 metadata:
   name: authentik-db-password
@@ -30,6 +30,6 @@ spec:
   dataFrom:
     - sourceRef:
         generatorRef:
-          apiVersion: generators.external-secrets.io/v1alpha1
+          apiVersion: generators.external-secrets.io/v1
           kind: Password
           name: authentik-db-password
