@@ -11,6 +11,7 @@ resources:
   - kustomizations/infra-external-secrets.yaml
   - kustomizations/infra-external-secrets-config.yaml
   - kustomizations/infra-cloudnativepg.yaml
+  - kustomizations/infra-cloudnativepg-role-secrets.yaml
   - kustomizations/infra-cloudnativepg-cluster.yaml
   - kustomizations/infra-cloudnativepg-vault-secrets.yaml
   - kustomizations/apps.yaml

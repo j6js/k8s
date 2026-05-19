@@ -15,3 +15,6 @@ spec:
     name: flux-system
   dependsOn:
     - name: infra-external-secrets-config
+    - name: infra-cloudnativepg-vault-secrets
+    - name: infra-cert-manager-config
+    - name: infra-envoy-gateway-config

@@ -7,9 +7,9 @@ spec:
   interval: 5m
   releaseName: eg
   install:
-    crds: CreateReplace
+    crds: Skip
   upgrade:
-    crds: CreateReplace
+    crds: Skip
     strategy:
       name: RetryOnFailure
       retryInterval: 5m

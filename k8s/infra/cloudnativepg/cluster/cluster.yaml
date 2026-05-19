@@ -27,6 +27,8 @@ spec:
         ensure: present
         comment: Authentik application role
         login: true
+        passwordSecret:
+          name: cnpg-cluster-authentik
         superuser: false
         createdb: false
         createrole: false
@@ -35,6 +37,8 @@ spec:
         ensure: present
         comment: Vaultwarden application role
         login: true
+        passwordSecret:
+          name: cnpg-cluster-vaultwarden
         superuser: false
         createdb: false
         createrole: false
@@ -43,6 +47,8 @@ spec:
         ensure: present
         comment: Grafana application role
         login: true
+        passwordSecret:
+          name: cnpg-cluster-grafana
         superuser: false
         createdb: false
         createrole: false
