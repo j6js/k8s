@@ -1,6 +1,6 @@
 locals {
     nlb_info = jsondecode(file("${path.module}/config/outputs/1-oci-tf.json")).nlb_ingress
-    base_domain = yamldecode(file("${path.module}/config/dns.yaml")).baseDomain
+    base_domain = yamldecode(file("${path.module}/config/config.yaml")).dns.baseDomain
 }
 
 resource "kubernetes_namespace_v1" "external_dns" {
@@ -14,33 +14,29 @@ resource "helm_release" "external_dns" {
   namespace     = "external-dns"
   repository    = "https://kubernetes-sigs.github.io/external-dns/"
   chart         = "external-dns"
-  version       = "1.21.1"
+  version       = yamldecode(file("${path.module}/shared/config.yaml")).versions.external-dns
   wait          = true
   wait_for_jobs = true
-  values = [
-    <<VALUES
-provider:
-  name: cloudflare
-crd:
-  create: true
-env:
-  - name: CF_API_TOKEN
-    valueFrom:
-      secretKeyRef:
-        name: cloudflare-api-token
-        key: apiKey
-
-domainFilters:
-  - ${local.base_domain}
-
-policy: sync
-
-sources:
-  - service
-  - ingress
-  - crd
-VALUES
-  ]
+  values = ["${yamlencode({
+    provider = {
+      name = "cloudflare"
+    }
+    crd = {
+      create = true
+    }
+    env = [{
+      name = "CF_API_TOKEN"
+      valueFrom = {
+        secretKeyRef = {
+          name = "cloudflare-api-token"
+          key = "apiKey"
+        }
+      }
+    }]
+    domainFilters = [local.base_domain]
+    policy = "sync"
+    sources = ["service", "ingress", "crd"]
+  })}"]
   depends_on = [kubernetes_namespace_v1.external_dns]
 }
 

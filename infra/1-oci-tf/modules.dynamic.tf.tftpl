@@ -87,34 +87,6 @@ module "iam_${region}" {
   }
 }
 %{ endfor ~}
-
-%{ for region in regions ~}
-module "iam_ccm_user_${region}" {
-  source = "./modules/oci/iam-ccm-user"
-  compartment_ocid = data.sops_file.oci_creds_regional["${region}"].data["compartment_ocid"]
-  tenancy_ocid = data.sops_file.oci_creds_regional["${region}"].data["tenancy_ocid"]
-  region = "${region}"
-  subnet_ocid = module.subnet_${region}.subnet_id
-  vcn_ocid = module.vcn_${region}.vcn_id
-  admin_user_ocid = data.sops_file.oci_creds_regional["${region}"].data["user_ocid"]
-  providers = {
-    oci = oci.${region}
-  }
-}
-%{ endfor ~}
-
-%{ for region in regions ~}
-module "iam_ccm_${region}" {
-  source = "./modules/oci/iam-ccm"
-  region_name = "${region}"
-  compartment_ocid = data.sops_file.oci_creds_regional["${region}"].data["compartment_ocid"]
-  group_ocid = module.iam_ccm_user_${region}.ccm_group_ocid
-  providers = {
-    oci = oci.${region}
-  }
-  depends_on = [module.iam_ccm_user_${region}]
-}
-%{ endfor ~}
 %{ for region in regions ~}
 module "talos-image_${region}" {
   source = "./modules/oci/talos-image"

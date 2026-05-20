@@ -2,40 +2,25 @@ resource "helm_release" "cilium" {
   name       = "cilium"
   namespace  = "kube-system"
   chart      = "oci://quay.io/cilium/charts/cilium"
-  version    = "1.19.4"
-
-  set = [
-    {
-      name  = "ipam.mode"
-      value = "kubernetes"
+  version    = yamldecode(file("${path.module}/shared/config.yaml")).versions.cilium
+  values = ["${yamlencode({
+    ipam = {
+      mode = "kubernetes"
     },
-    {
-      name  = "kubeProxyReplacement"
-      value = "true"
-    },
-    {
-      name  = "k8sServiceHost"
-      value = "localhost"
-    },
-    {
-      name  = "k8sServicePort"
-      value = "7445"
-    },
-    {
-      name = "securityContext.capabilities.ciliumAgent"
-      value = "{CHOWN,KILL,NET_ADMIN,NET_RAW,IPC_LOCK,SYS_ADMIN,SYS_RESOURCE,DAC_OVERRIDE,FOWNER,SETGID,SETUID}"
-    },
-    { 
-      name = "securityContext.capabilities.cleanCiliumState"
-      value = "{NET_ADMIN,SYS_ADMIN,SYS_RESOURCE}"
-    },
-    {
-      name = "cgroup.autoMount.enabled"
-      value = "false"
-    },
-    {
-      name = "cgroup.hostRoot"
-      value = "/sys/fs/cgroup"
+    kubeProxyReplacement = "true",
+    k8sServiceHost = "localhost",
+    k8sServicePort = "7445",
+    securityContext = {
+      capabilities = {
+        ciliumAgent = ["CHOWN","KILL","NET_ADMIN","NET_RAW","IPC_LOCK","SYS_ADMIN","SYS_RESOURCE","DAC_OVERRIDE","FOWNER","SETGID","SETUID"],
+        cleanCiliumState = ["NET_ADMIN","SYS_ADMIN","SYS_RESOURCE"]
+      }
     }
-  ]
+    cgroup = {
+      autoMount = {
+        enabled = false
+      },
+      hostRoot = "/sys/fs/cgroup"
+    }
+  })}"]
 }
