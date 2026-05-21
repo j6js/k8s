@@ -1,0 +1,43 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: app-authentik
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  project: default
+  source:
+    repoURL: https://charts.goauthentik.io/
+    chart: authentik
+    targetRevision: 2026.2.3
+    helm:
+      valuesObject:
+        authentik:
+          existingSecret:
+            secretName: authentik-secret-key
+        global:
+          env:
+            - name: AUTHENTIK_ERROR_REPORTING__ENABLED
+              value: "false"
+          envFrom:
+            - secretRef:
+                name: authentik-db-credentials
+        postgresql:
+          enabled: false
+        server:
+          route:
+            main:
+              enabled: true
+              parentRefs:
+                - name: authentik-gw
+                  namespace: default
+              hostnames:
+                - authentik.j6js.com
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

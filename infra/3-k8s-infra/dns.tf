@@ -1,12 +1,12 @@
 locals {
-    nlb_info = jsondecode(file("${path.module}/config/outputs/1-oci-tf.json")).nlb_ingress
-    base_domain = yamldecode(file("${path.module}/config/config.yaml")).dns.baseDomain
+  nlb_info    = jsondecode(file("${path.module}/config/outputs/1-oci-tf.json")).nlb_ingress
+  base_domain = yamldecode(file("${path.module}/config/config.yaml")).dns.baseDomain
 }
 
 resource "kubernetes_namespace_v1" "external_dns" {
-    metadata {
-        name = "external-dns"
-    }
+  metadata {
+    name = "external-dns"
+  }
 }
 
 resource "helm_release" "external_dns" {
@@ -14,7 +14,7 @@ resource "helm_release" "external_dns" {
   namespace     = "external-dns"
   repository    = "https://kubernetes-sigs.github.io/external-dns/"
   chart         = "external-dns"
-  version       = yamldecode(file("${path.module}/shared/config.yaml")).versions.external-dns
+  version       = yamldecode(file("${path.module}/config/config.yaml")).versions.external-dns
   wait          = true
   wait_for_jobs = true
   values = ["${yamlencode({
@@ -29,13 +29,13 @@ resource "helm_release" "external_dns" {
       valueFrom = {
         secretKeyRef = {
           name = "cloudflare-api-token"
-          key = "apiKey"
+          key  = "apiKey"
         }
       }
     }]
     domainFilters = [local.base_domain]
-    policy = "sync"
-    sources = ["service", "ingress", "crd"]
+    policy        = "sync"
+    sources       = ["service", "ingress", "crd"]
   })}"]
   depends_on = [kubernetes_namespace_v1.external_dns]
 }
@@ -59,18 +59,18 @@ resource "kubectl_manifest" "regional_dns_endpoint" {
       namespace = "external-dns"
     }
     spec = {
-        endpoints = [
-            {
-                dnsName = "${each.key}.hl.${local.base_domain}"
-                recordType = "A"
-                targets = [each.value.public_ipv4]
-            },
-            {
-                dnsName = "${each.key}.hl.${local.base_domain}"
-                recordType = "AAAA"
-                targets = [each.value.public_ipv6]
-            }
-        ]
+      endpoints = [
+        {
+          dnsName    = "${each.key}.hl.${local.base_domain}"
+          recordType = "A"
+          targets    = [each.value.public_ipv4]
+        },
+        {
+          dnsName    = "${each.key}.hl.${local.base_domain}"
+          recordType = "AAAA"
+          targets    = [each.value.public_ipv6]
+        }
+      ]
     }
   })
   depends_on = [helm_release.external_dns]
@@ -84,13 +84,13 @@ resource "kubectl_manifest" "global_dns_endpoint" {
       namespace = "external-dns"
     }
     spec = {
-        endpoints = [
-            for nlb, info in local.nlb_info : {
-                dnsName = "hl.${local.base_domain}"
-                recordType = "CNAME"
-                targets = ["${nlb}.hl.${local.base_domain}"]
-            }
-        ]
+      endpoints = [
+        for nlb, info in local.nlb_info : {
+          dnsName    = "hl.${local.base_domain}"
+          recordType = "CNAME"
+          targets    = ["${nlb}.hl.${local.base_domain}"]
+        }
+      ]
     }
   })
   depends_on = [helm_release.external_dns]

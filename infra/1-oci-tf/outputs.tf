@@ -11,7 +11,6 @@ resource "local_file" "output_json" {
     ]
     nlb_ingress = local.nlb_ingress
     vault_kms   = module.kms_for_hc_vault.kms_secrets
-    ccm_secrets = local.ccm_secrets
   })
   filename = "${local.terragrunt_dir}/config/outputs/1-oci-tf.json"
 }

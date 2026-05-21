@@ -5,7 +5,7 @@ versions:
   k8s: 1.36.0
   cilium: 1.19.4
   external-dns: 1.21.1
-  argocd: 3.4.2
+  argocd: 9.5.14 # NOT ArgoCD's version, but the version of this: https://github.com/argoproj/argo-helm/pkgs/container/argo-helm%2Fargo-cd (the helm chart, not ArgoCD itself)
 argocd:
   repoUrl: https://github.com/j6js/k8s.git
   externalUrl: https://argo.j6js.com

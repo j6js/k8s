@@ -1,5 +1,5 @@
 locals {
-    vault_kms_input = jsondecode(file("${path.module}/config/outputs/1-oci-tf.json")).vault_kms
+  vault_kms_input = jsondecode(file("${path.module}/config/outputs/1-oci-tf.json")).vault_kms
 }
 
 resource "kubernetes_secret_v1" "vault_oci_kms" {
@@ -9,11 +9,11 @@ resource "kubernetes_secret_v1" "vault_oci_kms" {
   }
   data = local.vault_kms_input
   depends_on = [
-kubernetes_namespace_v1.vault
+    kubernetes_namespace_v1.vault
   ]
 }
 resource "kubernetes_namespace_v1" "vault" {
-    metadata {
-        name = "vault"
-    }
+  metadata {
+    name = "vault"
+  }
 }

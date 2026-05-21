@@ -1,9 +1,4 @@
 locals {
-  ccm_secrets = {
-%{ for region in regions_list ~}
-    "${region}" = module.iam_ccm_user_${region}.ccm_secrets,
-%{ endfor ~}
-  }
   all_public_ipv4s = merge(
     %{ for region in regions_list ~}
      module.vm_${region}.public_ips,

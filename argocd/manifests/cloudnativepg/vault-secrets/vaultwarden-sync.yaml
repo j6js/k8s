@@ -1,0 +1,23 @@
+apiVersion: external-secrets.io/v1alpha1
+kind: PushSecret
+metadata:
+  name: cnpg-vaultwarden-to-vault
+  namespace: cnpg-system
+spec:
+  secretStoreRefs:
+    - name: vault-backend
+      kind: ClusterSecretStore
+  selector:
+    secret:
+      name: cnpg-cluster-vaultwarden
+  template:
+    engineVersion: v2
+    data:
+      secret/data/cnpg/vaultwarden: |
+        {
+          "username": "{{ .username }}",
+          "password": "{{ .password }}",
+          "host": "cnpg-pooler.cnpg-system.svc.cluster.local",
+          "port": "5432",
+          "dbname": "vaultwarden"
+        }

@@ -1,9 +1,6 @@
-data "sops_file" "flux_operator" {
-    source_file = "${path.module}/../.sops/flux-operator.yaml"
+data "sops_file" "argocd" {
+  source_file = "${path.module}/../.sops/argocd.yaml"
 }
-data "sops_file" "flux_sops"{
-    source_file = "${path.module}/../.sops/flux-sops.yaml"
-}
-data "sops_file" "cloudflare"{
-    source_file = "${path.module}/../.sops/cloudflare.yaml"
+data "sops_file" "cloudflare" {
+  source_file = "${path.module}/../.sops/cloudflare.yaml"
 }
