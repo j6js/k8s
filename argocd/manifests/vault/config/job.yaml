@@ -1,0 +1,104 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: vault-config
+  namespace: vault
+spec:
+  backoffLimit: 10
+  template:
+    spec:
+      serviceAccountName: vault-config
+      restartPolicy: OnFailure
+      initContainers:
+        - name: wait-for-vault
+          image: busybox:1.37
+          command:
+            - /bin/sh
+            - -c
+            - |
+              echo "Waiting for Vault to be ready..."
+              until wget -qO- http://infra-vault-internal.vault.svc.cluster.local:8200/v1/sys/health 2>/dev/null; do
+                echo "Vault not ready, retrying in 5s..."
+                sleep 5
+              done
+              echo "Vault is ready."
+      containers:
+        - name: vault-config
+          image: hashicorp/vault:1.22.0
+          command:
+            - /bin/sh
+            - -c
+            - |
+              set -e
+              export VAULT_ADDR=http://infra-vault-internal.vault.svc.cluster.local:8200
+              export VAULT_TOKEN="$(cat /vault/token/root-token)"
+
+              # Enable KV v2 secrets engine at secret/
+              echo "Enabling KV v2 secrets engine..."
+              vault secrets enable -version=2 -path=secret kv 2>/dev/null || echo "KV v2 already enabled"
+
+              # Enable Kubernetes auth
+              echo "Enabling Kubernetes auth method..."
+              vault auth enable kubernetes 2>/dev/null || echo "K8s auth already enabled"
+
+              # Configure K8s auth to use the cluster's own API server
+              echo "Configuring Kubernetes auth..."
+              vault write auth/kubernetes/config \
+                kubernetes_host="https://$KUBERNETES_PORT_443_TCP_ADDR:443" \
+                kubernetes_ca_cert=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt \
+                token_reviewer_jwt=/var/run/secrets/kubernetes.io/serviceaccount/token \
+                issuer="https://kubernetes.default.svc.cluster.local"
+
+              # Write CNPG reader policy
+              echo "Writing cnpg-reader policy..."
+              vault policy write cnpg-reader - <<'POLICY'
+              path "secret/data/cnpg/*" {
+                capabilities = ["read", "list"]
+              }
+              path "secret/metadata/cnpg/*" {
+                capabilities = ["read", "list"]
+              }
+              path "secret/metadata" {
+                capabilities = ["list"]
+              }
+              POLICY
+
+              # Write external-secrets policy (broader, for general use)
+              echo "Writing external-secrets policy..."
+              vault policy write external-secrets - <<'POLICY'
+              path "secret/data/*" {
+                capabilities = ["read", "list"]
+              }
+              path "secret/metadata/*" {
+                capabilities = ["read", "list"]
+              }
+              POLICY
+
+              # Create role for external-secrets SA in external-secrets ns
+              echo "Creating K8s auth role for external-secrets..."
+              vault write auth/kubernetes/role/external-secrets \
+                bound_service_account_names=external-secrets \
+                bound_service_account_namespaces=external-secrets \
+                policies=external-secrets \
+                ttl=1h
+
+              # Create role for any SA in any namespace (cnpg-reader policy restricts path)
+              echo "Creating K8s auth role for CNPG..."
+              vault write auth/kubernetes/role/cnpg-reader \
+                bound_service_account_names="*" \
+                bound_service_account_namespaces="*" \
+                policies=cnpg-reader \
+                ttl=1h
+
+              echo "Vault configuration complete."
+          env:
+            - name: KUBERNETES_PORT_443_TCP_ADDR
+              value: kubernetes.default.svc
+          volumeMounts:
+            - name: vault-token
+              mountPath: /vault/token
+              readOnly: true
+      volumes:
+        - name: vault-token
+          secret:
+            secretName: vault-root-token
