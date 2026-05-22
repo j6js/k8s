@@ -7,82 +7,114 @@ export VAULT_ADDR=https://vault.j6js.com  # or internal: http://infra-vault-inte
 export VAULT_TOKEN=<your-root-token>
 ```
 
-## 1. Enable KV v2 secrets engine
+## 1. Enable the database secrets engine
 
 ```bash
-vault secrets enable -version=2 -path=secret kv
+vault secrets enable database
 ```
 
-## 2. Enable Kubernetes auth
+## 2. Configure the PostgreSQL connection
+
+This connects Vault to your CNPG-managed PostgreSQL. Vault needs a privileged user
+that can create/rotate roles. CNPG automatically creates a `postgres` superuser —
+retrieve its password from the K8s secret that CNPG generates (e.g. `cnpg-cluster-app`
+in the application namespace).
 
 ```bash
-vault auth enable kubernetes
+vault write database/config/cnpg \
+  plugin_name=postgresql-database-plugin \
+  allowed_roles="cnpg-superuser,cnpg-app" \
+  connection_url="postgresql://{{username}}:{{password}}.<CNPG_CLUSTER_NAMESPACE>.svc.cluster.local:5432/postgres?sslmode=require" \
+  username="postgres" \
+  password="<cnpg-superuser-password>" \
+  password_authentication=scram-sha-256
 ```
 
-## 3. Configure Kubernetes auth
+> **Note:** Replace `<CNPG_CLUSTER_NAMESPACE>` with the namespace where your CNPG
+> Cluster runs, and `<cnpg-superuser-password>` with the password from the CNPG-managed
+> K8s secret (usually named `<cluster-name>-superuser` or similar).
+
+## 3. Create a superuser role (for CNPG `superuserSecret`)
+
+This role creates a new PostgreSQL superuser with a 1h TTL. Used for CNPG's
+`spec.superuserSecret`.
 
 ```bash
-vault write auth/kubernetes/config \
-  kubernetes_host="https://kubernetes.default.svc:443" \
-  issuer="https://kubernetes.default.svc.cluster.local"
+vault write database/roles/cnpg-superuser \
+  db_name=cnpg \
+  creation_statements="CREATE ROLE \"{{name}}\" WITH LOGIN PASSWORD '{{password}}' VALID UNTIL '{{expiration}}' SUPERUSER" \
+  revocation_statements="DROP ROLE IF EXISTS \"{{name}}\"" \
+  default_ttl=1h \
+  max_ttl=24h
 ```
 
-## 4. Create policies
+## 4. Create an app role (for application connections)
+
+This role creates a user with read/write access to all tables in `public`.
+Adjust the `GRANT` statements to match your needs.
 
 ```bash
-vault policy write cnpg-reader - <<'EOF'
-path "secret/data/cnpg/*" {
-  capabilities = ["read", "list"]
-}
-path "secret/metadata/cnpg/*" {
-  capabilities = ["read", "list"]
-}
-path "secret/metadata" {
-  capabilities = ["list"]
+vault write database/roles/cnpg-app \
+  db_name=cnpg \
+  creation_statements="CREATE ROLE \"{{name}}\" WITH LOGIN PASSWORD '{{password}}' VALID UNTIL '{{expiration}}'; GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO \"{{name}}\"; GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO \"{{name}}\";" \
+  revocation_statements="DROP ROLE IF EXISTS \"{{name}}\"" \
+  default_ttl=1h \
+  max_ttl=24h
+```
+
+## 5. Create policies for External Secrets
+
+```bash
+vault policy write cnpg-superuser - <<'EOF'
+path "database/creds/cnpg-superuser" {
+  capabilities = ["read"]
 }
 EOF
 
-vault policy write external-secrets - <<'EOF'
-path "secret/data/*" {
-  capabilities = ["read", "list"]
-}
-path "secret/metadata/*" {
-  capabilities = ["read", "list"]
+vault policy write cnpg-app - <<'EOF'
+path "database/creds/cnpg-app" {
+  capabilities = ["read"]
 }
 EOF
 ```
 
-## 5. Create K8s auth roles
+## 6. Create K8s auth roles
 
 ```bash
-vault write auth/kubernetes/role/external-secrets \
+vault write auth/kubernetes/role/cnpg-superuser \
   bound_service_account_names=external-secrets \
   bound_service_account_namespaces=external-secrets \
-  policies=external-secrets \
+  policies=cnpg-superuser \
   ttl=1h
 
-vault write auth/kubernetes/role/cnpg-reader \
-  bound_service_account_names="*" \
-  bound_service_account_namespaces="*" \
-  policies=cnpg-reader \
+vault write auth/kubernetes/role/cnpg-app \
+  bound_service_account_names=external-secrets \
+  bound_service_account_namespaces=external-secrets \
+  policies=cnpg-app \
   ttl=1h
-```
-
-## 6. Store CNPG credentials
-
-For each CNPG cluster:
-
-```bash
-vault kv put secret/cnpg/<cluster-name>/superuser \
-  username=postgres \
-  password=<generated-password>
 ```
 
 ## 7. Verify
 
 ```bash
-vault read auth/kubernetes/role/external-secrets
-vault read auth/kubernetes/role/cnpg-reader
-vault policy read cnpg-reader
-vault policy read external-secrets
+# Test dynamic credential generation
+vault read database/creds/cnpg-superuser
+vault read database/creds/cnpg-app
+
+# Verify roles
+vault read database/roles/cnpg-superuser
+vault read database/roles/cnpg-app
+
+# Verify policies
+vault policy read cnpg-superuser
+vault policy read cnpg-app
+```
+
+## 8. (Optional) Rotate root credentials
+
+After confirming everything works, rotate the root password so Vault is the only
+one that knows it:
+
+```bash
+vault write -f database/rotate-root/cnpg
 ```
