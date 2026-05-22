@@ -1,34 +1,88 @@
-# Vault Configuration
+# Vault Configuration — Manual Setup Steps
 
-This directory contains manifests that configure Vault after it's deployed.
-Applied at ArgoCD sync-wave 1 (same wave as the Vault Helm release).
-
-## One-time setup required
-
-Before the `vault-config` Job can run, you must create a secret containing
-the Vault root token:
+Run these once against the cluster after Vault is deployed and unsealed.
 
 ```bash
-kubectl create secret generic vault-root-token \
-  --namespace vault \
-  --from-literal=root-token=<your-vault-root-token>
+export VAULT_ADDR=https://vault.j6js.com  # or internal: http://infra-vault-internal.vault.svc.cluster.local:8200
+export VAULT_TOKEN=<your-root-token>
 ```
 
-The root token is generated during `vault operator init`. If you used the
-Helm chart with OCI KMS auto-unseal, the init happens automatically and
-the root token was printed to the pod logs of the first Vault pod.
-
-To retrieve it from the Vault pod:
+## 1. Enable KV v2 secrets engine
 
 ```bash
-kubectl logs -n vault infra-vault-0 | grep "Root Token"
+vault secrets enable -version=2 -path=secret kv
 ```
 
-## What the Job configures
+## 2. Enable Kubernetes auth
 
-1. **KV v2 secrets engine** at `secret/`
-2. **Kubernetes auth method** with token reviewer
-3. **Policy `cnpg-reader`** — read-only access to `secret/data/cnpg/*`
-4. **Policy `external-secrets`** — read-only access to `secret/data/*`
-5. **K8s auth role `external-secrets`** — for the `external-secrets` SA in the `external-secrets` namespace
-6. **K8s auth role `cnpg-reader`** — for any SA in any namespace (restricted by policy)
+```bash
+vault auth enable kubernetes
+```
+
+## 3. Configure Kubernetes auth
+
+```bash
+vault write auth/kubernetes/config \
+  kubernetes_host="https://kubernetes.default.svc:443" \
+  issuer="https://kubernetes.default.svc.cluster.local"
+```
+
+## 4. Create policies
+
+```bash
+vault policy write cnpg-reader - <<'EOF'
+path "secret/data/cnpg/*" {
+  capabilities = ["read", "list"]
+}
+path "secret/metadata/cnpg/*" {
+  capabilities = ["read", "list"]
+}
+path "secret/metadata" {
+  capabilities = ["list"]
+}
+EOF
+
+vault policy write external-secrets - <<'EOF'
+path "secret/data/*" {
+  capabilities = ["read", "list"]
+}
+path "secret/metadata/*" {
+  capabilities = ["read", "list"]
+}
+EOF
+```
+
+## 5. Create K8s auth roles
+
+```bash
+vault write auth/kubernetes/role/external-secrets \
+  bound_service_account_names=external-secrets \
+  bound_service_account_namespaces=external-secrets \
+  policies=external-secrets \
+  ttl=1h
+
+vault write auth/kubernetes/role/cnpg-reader \
+  bound_service_account_names="*" \
+  bound_service_account_namespaces="*" \
+  policies=cnpg-reader \
+  ttl=1h
+```
+
+## 6. Store CNPG credentials
+
+For each CNPG cluster:
+
+```bash
+vault kv put secret/cnpg/<cluster-name>/superuser \
+  username=postgres \
+  password=<generated-password>
+```
+
+## 7. Verify
+
+```bash
+vault read auth/kubernetes/role/external-secrets
+vault read auth/kubernetes/role/cnpg-reader
+vault policy read cnpg-reader
+vault policy read external-secrets
+```
