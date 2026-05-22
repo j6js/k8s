@@ -24,76 +24,75 @@ spec:
               echo "Vault is ready."
       containers:
         - name: vault-config
-          image: hashicorp/vault:2.0.1
+          image: alpine:3.22
           command:
             - /bin/sh
             - -c
             - |
               set -e
-              export VAULT_ADDR=http://infra-vault-internal.vault.svc.cluster.local:8200
-              export VAULT_TOKEN="$(cat /vault/token/root-token)"
 
-              # Enable KV v2 secrets engine at secret/
+              # Install jq for JSON construction
+              apk add --no-cache jq curl > /dev/null 2>&1
+
+              VAULT_ADDR=http://infra-vault-internal.vault.svc.cluster.local:8200
+              VAULT_TOKEN="$(cat /vault/token/root-token)"
+              SA_TOKEN="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)"
+              CA_CERT="$(cat /var/run/secrets/kubernetes.io/serviceaccount/ca.crt)"
+
+              vault_post() {
+                local path="$1"
+                local data="$2"
+                curl -sf -X POST \
+                  -H "X-Vault-Token: $VAULT_TOKEN" \
+                  -H "Content-Type: application/json" \
+                  -d "$data" \
+                  "$VAULT_ADDR$path" || true
+              }
+
+              vault_put() {
+                local path="$1"
+                local data="$2"
+                curl -sf -X PUT \
+                  -H "X-Vault-Token: $VAULT_TOKEN" \
+                  -H "Content-Type: application/json" \
+                  -d "$data" \
+                  "$VAULT_ADDR$path" || true
+              }
+
               echo "Enabling KV v2 secrets engine..."
-              vault secrets enable -version=2 -path=secret kv 2>/dev/null || echo "KV v2 already enabled"
+              vault_post /v1/sys/mounts/secret \
+                '{"type":"kv","options":{"version":"2"}}'
 
-              # Enable Kubernetes auth
               echo "Enabling Kubernetes auth method..."
-              vault auth enable kubernetes 2>/dev/null || echo "K8s auth already enabled"
+              vault_post /v1/sys/auth/kubernetes \
+                '{"type":"kubernetes"}'
 
-              # Configure K8s auth to use the cluster's own API server
               echo "Configuring Kubernetes auth..."
-              vault write auth/kubernetes/config \
-                kubernetes_host="https://$KUBERNETES_PORT_443_TCP_ADDR:443" \
-                kubernetes_ca_cert=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt \
-                token_reviewer_jwt=/var/run/secrets/kubernetes.io/serviceaccount/token \
-                issuer="https://kubernetes.default.svc.cluster.local"
+              K8S_CONFIG=$(jq -n \
+                --arg host "https://kubernetes.default.svc:443" \
+                --arg jwt "$SA_TOKEN" \
+                --arg ca "$CA_CERT" \
+                --arg issuer "https://kubernetes.default.svc.cluster.local" \
+                '{kubernetes_host:$host,token_reviewer_jwt:$jwt,kubernetes_ca_cert:$ca,issuer:$issuer}')
+              vault_post /v1/auth/kubernetes/config "$K8S_CONFIG"
 
-              # Write CNPG reader policy
               echo "Writing cnpg-reader policy..."
-              vault policy write cnpg-reader - <<'POLICY'
-              path "secret/data/cnpg/*" {
-                capabilities = ["read", "list"]
-              }
-              path "secret/metadata/cnpg/*" {
-                capabilities = ["read", "list"]
-              }
-              path "secret/metadata" {
-                capabilities = ["list"]
-              }
-              POLICY
+              vault_put /v1/sys/policies/acl/cnpg-reader \
+                '{"policy":"path \"secret/data/cnpg/*\" { capabilities = [\"read\", \"list\"] }\npath \"secret/metadata/cnpg/*\" { capabilities = [\"read\", \"list\"] }\npath \"secret/metadata\" { capabilities = [\"list\"] }\n"}'
 
-              # Write external-secrets policy (broader, for general use)
               echo "Writing external-secrets policy..."
-              vault policy write external-secrets - <<'POLICY'
-              path "secret/data/*" {
-                capabilities = ["read", "list"]
-              }
-              path "secret/metadata/*" {
-                capabilities = ["read", "list"]
-              }
-              POLICY
+              vault_put /v1/sys/policies/acl/external-secrets \
+                '{"policy":"path \"secret/data/*\" { capabilities = [\"read\", \"list\"] }\npath \"secret/metadata/*\" { capabilities = [\"read\", \"list\"] }\n"}'
 
-              # Create role for external-secrets SA in external-secrets ns
               echo "Creating K8s auth role for external-secrets..."
-              vault write auth/kubernetes/role/external-secrets \
-                bound_service_account_names=external-secrets \
-                bound_service_account_namespaces=external-secrets \
-                policies=external-secrets \
-                ttl=1h
+              vault_post /v1/auth/kubernetes/role/external-secrets \
+                '{"bound_service_account_names":"external-secrets","bound_service_account_namespaces":"external-secrets","policies":"external-secrets","ttl":"1h"}'
 
-              # Create role for any SA in any namespace (cnpg-reader policy restricts path)
               echo "Creating K8s auth role for CNPG..."
-              vault write auth/kubernetes/role/cnpg-reader \
-                bound_service_account_names="*" \
-                bound_service_account_namespaces="*" \
-                policies=cnpg-reader \
-                ttl=1h
+              vault_post /v1/auth/kubernetes/role/cnpg-reader \
+                '{"bound_service_account_names":"*","bound_service_account_namespaces":"*","policies":"cnpg-reader","ttl":"1h"}'
 
               echo "Vault configuration complete."
-          env:
-            - name: KUBERNETES_PORT_443_TCP_ADDR
-              value: kubernetes.default.svc
           volumeMounts:
             - name: vault-token
               mountPath: /vault/token
