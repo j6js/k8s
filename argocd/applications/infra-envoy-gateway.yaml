@@ -10,7 +10,7 @@ spec:
   source:
     repoURL: docker.io/envoyproxy
     chart: gateway-helm
-    targetRevision: "*"
+    targetRevision: "1.8.0"
     helm:
       releaseName: eg
   destination:
