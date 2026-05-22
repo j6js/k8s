@@ -1,3 +1,6 @@
+# Copyright Jackson Kelly 2026
+# SPDX-License-Identifier: BUSL-1.1
+
 resource "local_file" "output_json" {
   content = jsonencode({
     nodes = [

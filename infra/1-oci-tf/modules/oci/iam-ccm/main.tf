@@ -1,3 +1,6 @@
+# Copyright Jackson Kelly 2026
+# SPDX-License-Identifier: BUSL-1.1
+
 resource "oci_identity_policy" "ccm_load_balancer" {
   compartment_id = var.compartment_ocid
   name           = "ccm-lb-${var.region_name}"

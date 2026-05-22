@@ -1,3 +1,6 @@
+# Copyright Jackson Kelly 2026
+# SPDX-License-Identifier: BUSL-1.1
+
 locals {
   regions_list   = tolist(yamldecode(file("${local.terragrunt_dir}/config/oci-config/regions.yaml")))
   regions        = toset(local.regions_list)

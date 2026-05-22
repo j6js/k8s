@@ -1,3 +1,6 @@
+# Copyright Jackson Kelly 2026
+# SPDX-License-Identifier: BUSL-1.1
+
 resource "oci_identity_policy" "requestors" {
   for_each       = toset(var.requestors)
   compartment_id = var.region_ocids[var.region_name]["tenancy_ocid"]

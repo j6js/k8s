@@ -1,3 +1,6 @@
+# Copyright Jackson Kelly 2026
+# SPDX-License-Identifier: BUSL-1.1
+
 resource "time_sleep" "drg_attachment_wait" {
   create_duration = "30s"
   depends_on      = [oci_core_remote_peering_connection.requestor_rpc]

@@ -1,3 +1,6 @@
+# Copyright Jackson Kelly 2026
+# SPDX-License-Identifier: BUSL-1.1
+
 data "oci_identity_availability_domains" "this" {
   compartment_id = var.tenancy_ocid
 }

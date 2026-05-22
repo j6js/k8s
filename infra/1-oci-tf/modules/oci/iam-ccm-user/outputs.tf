@@ -1,3 +1,6 @@
+# Copyright Jackson Kelly 2026
+# SPDX-License-Identifier: BUSL-1.1
+
 output "ccm_group_ocid" {
   value     = oci_identity_group.ccm.id
   sensitive = true

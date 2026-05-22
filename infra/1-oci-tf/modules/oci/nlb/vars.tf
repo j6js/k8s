@@ -1,3 +1,6 @@
+# Copyright Jackson Kelly 2026
+# SPDX-License-Identifier: BUSL-1.1
+
 variable "compartment_id" {
   description = "The OCID of the compartment in which to create the network load balancer."
   type        = string

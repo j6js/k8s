@@ -1,3 +1,6 @@
+# Copyright Jackson Kelly 2026
+# SPDX-License-Identifier: BUSL-1.1
+
 data "oci_core_vcn" "this" {
   vcn_id = var.vcn_id
 }

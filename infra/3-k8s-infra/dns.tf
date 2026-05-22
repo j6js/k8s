@@ -1,3 +1,6 @@
+# Copyright Jackson Kelly 2026
+# SPDX-License-Identifier: BUSL-1.1
+
 locals {
   nlb_info    = jsondecode(file("${path.module}/config/outputs/1-oci-tf.json")).nlb_ingress
   base_domain = yamldecode(file("${path.module}/config/config.yaml")).dns.baseDomain

@@ -1,3 +1,6 @@
+# Copyright Jackson Kelly 2026
+# SPDX-License-Identifier: BUSL-1.1
+
 data "oci_objectstorage_namespace" "talos" {
   compartment_id = var.compartment_ocid
 }

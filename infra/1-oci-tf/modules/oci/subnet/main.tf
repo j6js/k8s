@@ -1,3 +1,6 @@
+# Copyright Jackson Kelly 2026
+# SPDX-License-Identifier: BUSL-1.1
+
 resource "oci_core_security_list" "sl" {
   compartment_id = var.compartment_ocid
   vcn_id         = var.vcn_id

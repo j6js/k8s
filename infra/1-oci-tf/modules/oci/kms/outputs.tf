@@ -1,3 +1,6 @@
+# Copyright Jackson Kelly 2026
+# SPDX-License-Identifier: BUSL-1.1
+
 locals {
   vault_oci_kms_secret = {
     "VAULT_OCIKMS_CRYPTO_ENDPOINT"     = oci_kms_vault.hc_vault_oci_kms.crypto_endpoint

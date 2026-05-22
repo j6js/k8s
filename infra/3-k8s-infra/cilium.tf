@@ -1,3 +1,6 @@
+# Copyright Jackson Kelly 2026
+# SPDX-License-Identifier: BUSL-1.1
+
 resource "helm_release" "cilium" {
   name      = "cilium"
   namespace = "kube-system"

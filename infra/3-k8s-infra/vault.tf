@@ -1,3 +1,6 @@
+# Copyright Jackson Kelly 2026
+# SPDX-License-Identifier: BUSL-1.1
+
 locals {
   vault_kms_input = jsondecode(file("${path.module}/config/outputs/1-oci-tf.json")).vault_kms
 }

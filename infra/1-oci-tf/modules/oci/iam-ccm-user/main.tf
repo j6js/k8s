@@ -1,3 +1,6 @@
+# Copyright Jackson Kelly 2026
+# SPDX-License-Identifier: BUSL-1.1
+
 resource "tls_private_key" "ccm" {
   algorithm = "RSA"
   rsa_bits  = 4096

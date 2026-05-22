@@ -1,3 +1,6 @@
+# Copyright Jackson Kelly 2026
+# SPDX-License-Identifier: BUSL-1.1
+
 output "id" {
   value = oci_network_load_balancer_network_load_balancer.ingress.id
 }

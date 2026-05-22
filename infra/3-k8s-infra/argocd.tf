@@ -1,3 +1,6 @@
+# Copyright Jackson Kelly 2026
+# SPDX-License-Identifier: BUSL-1.1
+
 resource "kubernetes_namespace_v1" "argocd_system" {
   metadata {
     name = "argocd"

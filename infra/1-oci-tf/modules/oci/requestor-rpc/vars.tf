@@ -1,3 +1,6 @@
+# Copyright Jackson Kelly 2026
+# SPDX-License-Identifier: BUSL-1.1
+
 variable "requestor_region_names" {
   description = "Map of acceptor region -> region name for peering"
   type        = map(string)

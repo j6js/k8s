@@ -1,3 +1,6 @@
+# Copyright Jackson Kelly 2026
+# SPDX-License-Identifier: BUSL-1.1
+
 resource "oci_core_vcn" "vcn" {
   compartment_id = var.compartment_ocid
   cidr_blocks    = [var.priv_ipv4_cidr]
