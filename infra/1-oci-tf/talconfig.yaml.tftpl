@@ -1,0 +1,125 @@
+clusterName: "${cluster_name}"
+endpoint: "https://[${cluster_endpoint}]:6443"
+
+imageFactory:
+  registryURL: "factory.talos.dev"
+  schematicEndpoint: "/schematics"
+  protocol: "http"
+  installerURLTmpl: "{{.RegistryURL}}/oracle-installer/{{.ID}}:{{.Version}}"
+
+patches:
+  - |-
+    cluster:
+      network:
+        cni:
+          name: none
+      proxy:
+        disabled: true
+    machine:
+      sysctls:
+        net.ipv4.ip_forward: "1"
+        net.ipv6.conf.all.forwarding: "1"
+        net.ipv4.conf.all.rp_filter: "0"
+        net.ipv4.conf.default.rp_filter: "0"
+
+worker:
+  schematic: &default_schematic
+    customization:
+      systemExtensions:
+        officialExtensions:
+          - siderolabs/iscsi-tools
+          - siderolabs/util-linux-tools
+  patches:
+    - |-
+      machine:
+        network:
+          nameservers:
+            - 1.1.1.1
+            - 1.0.0.1
+            - 2606:4700:4700::1111
+            - 2606:4700:4700::1001
+        time:
+          servers:
+            - time.cloudflare.com
+            - pool.ntp.org
+
+controlPlane:
+  schematic: *default_schematic
+  patches:
+    - |-
+      machine:
+        time:
+          servers:
+            - time.cloudflare.com
+            - pool.ntp.org
+        network:
+          nameservers:
+            - 1.1.1.1
+            - 1.0.0.1
+            - 2606:4700:4700::1111
+            - 2606:4700:4700::1001
+          interfaces:
+            - interface: eth0
+              dhcp: true
+
+talosVersion: v1.13.2
+
+additionalApiServerCertSans:
+  - "${cluster_endpoint}"
+%{ for name, node in nodes ~}
+  - "${node.public_ipv6}"
+%{ endfor ~}
+
+nodes:
+%{ for name, node in nodes ~}
+%{ if node.role == "cp" ~}
+  - hostname: "${ replace(name, "_", "-") }"
+    ipAddress: "${node.public_ipv6}"
+
+    controlPlane: true
+    nodeLabels:
+      "topology.kubernetes.io/region": "${node.region}"
+    installDisk: /dev/sda
+    networkInterfaces:
+      - interface: eth0
+        dhcp: true
+        dhcpOptions:
+          ipv6: true
+
+%{ endif ~}
+%{ endfor ~}
+%{ for name, node in nodes ~}
+%{ if node.role == "sh" ~}
+  - hostname: "${ replace(name, "_", "-") }"
+    ipAddress: "${node.public_ipv6}"
+    controlPlane: true
+    nodeLabels:
+      "topology.kubernetes.io/region": "${node.region}"
+    installDisk: /dev/sda
+    networkInterfaces:
+      - interface: eth0
+        dhcp: true
+        dhcpOptions:
+          ipv6: true
+    patches:
+      - |-
+        cluster:
+          allowSchedulingOnControlPlanes: true
+
+%{ endif ~}
+%{ endfor ~}
+%{ for name, node in nodes ~}
+%{ if node.role == "wk" ~}
+  - hostname: "${ replace(name, "_", "-") }"
+    ipAddress: "${node.public_ipv6}"
+    controlPlane: false
+    installDisk: /dev/sda
+    nodeLabels:
+      "topology.kubernetes.io/region": "${node.region}"
+    networkInterfaces:
+      - interface: eth0
+        dhcp: true
+        dhcpOptions:
+          ipv6: true
+%{ endif ~}
+%{ endfor ~}

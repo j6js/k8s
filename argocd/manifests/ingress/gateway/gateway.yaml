@@ -1,0 +1,82 @@
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: vault
+  namespace: vault
+spec:
+  endpoints:
+    - dnsName: vault.j6js.com
+      recordType: CNAME
+      targets:
+        - hl.j6js.com
+---
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: argocd
+  namespace: vault
+spec:
+  endpoints:
+    - dnsName: argo.j6js.com
+      recordType: CNAME
+      targets:
+        - hl.j6js.com
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: vault-tls
+  namespace: vault
+spec:
+  secretName: vault-tls
+  dnsNames:
+    - vault.j6js.com
+  issuerRef:
+    name: letsencrypt
+    kind: ClusterIssuer
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: argocd-tls
+  namespace: vault
+spec:
+  secretName: argocd-tls
+  dnsNames:
+    - argo.j6js.com
+  issuerRef:
+    name: letsencrypt
+    kind: ClusterIssuer
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: public-gateway
+  namespace: vault
+spec:
+  gatewayClassName: envoy
+  listeners:
+    - name: vault-https
+      protocol: HTTPS
+      port: 443
+      hostname: vault.j6js.com
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: vault-tls
+            kind: Secret
+      allowedRoutes:
+        namespaces:
+          from: All
+    - name: argocd-https
+      protocol: HTTPS
+      port: 443
+      hostname: argo.j6js.com
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: argocd-tls
+            kind: Secret
+      allowedRoutes:
+        namespaces:
+          from: All
