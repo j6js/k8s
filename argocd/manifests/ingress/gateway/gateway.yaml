@@ -22,6 +22,19 @@ spec:
       targets:
         - hl.j6js.com
 ---
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: authentik
+  namespace: vaulg
+spec:
+  endpoints:
+    - dnsName: auth.j6js.com
+      recordType: CNAME
+      targets:
+        - hl.j6js.com
+
+---
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
@@ -44,6 +57,19 @@ spec:
   secretName: argocd-tls
   dnsNames:
     - argo.j6js.com
+  issuerRef:
+    name: letsencrypt
+    kind: ClusterIssuer
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: authentik-tls
+  namespace: vault
+spec:
+  secretName: authentik-tls
+  dnsNames:
+    - auth.j6js.com
   issuerRef:
     name: letsencrypt
     kind: ClusterIssuer
@@ -76,6 +102,18 @@ spec:
         mode: Terminate
         certificateRefs:
           - name: argocd-tls
+            kind: Secret
+      allowedRoutes:
+        namespaces:
+          from: All
+    - name: authentik-https
+      protocol: HTTPS
+      port: 443
+      hostname: auth.j6js.com
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: authentik-tls
             kind: Secret
       allowedRoutes:
         namespaces:
