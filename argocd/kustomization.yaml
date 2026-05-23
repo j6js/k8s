@@ -9,6 +9,7 @@ resources:
   - applications/infra-external-secrets-config.yaml
   - applications/infra-cert-manager-config.yaml
   - applications/infra-envoy-gateway-config.yaml
+  - applications/authentik-config.yaml
   - applications/authentik.yaml
   - applications/infra-gateway.yaml
   - applications/apps.yaml
