@@ -26,6 +26,12 @@ spec:
             repository: hashicorp/vault
             tag: 2.0.1
             pullPolicy: IfNotPresent
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 100
+            capabilities:
+              add:
+                - IPC_LOCK
           logLevel: debug
           dataStorage:
             enabled: true
