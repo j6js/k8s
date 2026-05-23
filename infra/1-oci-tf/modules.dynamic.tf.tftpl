@@ -93,7 +93,7 @@ module "talos-image_${region}" {
   compartment_ocid = data.sops_file.oci_creds_regional["${region}"].data["compartment_ocid"]
   talos_version   = local.config.versions.talos
   architecture    = local.config.arch
-  qcow2_source = "${terragrunt_dir}/talos/oracle-$${local.talos_config.architecture}.qcow2"
+  qcow2_source = "${terragrunt_dir}/talos/oracle-$${local.config.arch}.qcow2"
   shape_names     = ["VM.Standard.A1.Flex"]
   providers = {
     oci = oci.${region}
