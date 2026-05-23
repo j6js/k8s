@@ -2,3 +2,4 @@
 *.tf linguist-detectable=true linguist-language=HCL
 *.tf.tftpl linguist-detectable=true linguist-language=HCL
 *.yaml.tftpl linguist-detectable=true linguist-language=YAML
+*.toml linguist-detectable=true linguist-language=TOML
