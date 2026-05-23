@@ -10,52 +10,29 @@ spec:
   source:
     repoURL: https://charts.goauthentik.io
     chart: authentik
-    targetRevision: "2025.12.0"
+    targetRevision: "2026.5.0"
     helm:
       releaseName: authentik
       valuesObject:
-        authentik:
-          secretKey:
-            existingSecret: authentik-secret-key
-            existingSecretKey: authentik-secret-key
-          postgresql:
-            host: cnpg-rw.cnpg.svc.cluster.local
-            port: 5432
-            name: authentik
-            user: authentik
-            password:
-              existingSecret: authentik-db-credentials
-              existingSecretKey: password
-        server:
-          replicas: 1
-          resources:
-            requests:
-              cpu: 100m
-              memory: 256Mi
-            limits:
-              memory: 512Mi
-        worker:
-          replicas: 1
-          resources:
-            requests:
-              cpu: 100m
-              memory: 256Mi
-            limits:
-              memory: 512Mi
-        postgresql:
-          enabled: false
-        redis:
-          enabled: true
-          architecture: standalone
-          auth:
-            enabled: false
-          master:
-            resources:
-              requests:
-                cpu: 50m
-                memory: 64Mi
-              limits:
-                memory: 128Mi 
+       authentik:
+         secret_key: "PleaseGenerateASecureKey"
+         error_reporting:
+           enabled: true
+         postgresql:
+           password: "ThisIsNotASecurePassword"
+       server:
+         route:
+           main:
+             enabled: true
+             hostnames:
+               - authentik.domain.tld
+             parentRefs:
+               - name: shared-gateway
+                 namespace: default
+       postgresql:
+         enabled: true
+         auth:
+           password: "ThisIsNotASecurePassword" 
   destination:
     server: https://kubernetes.default.svc
     namespace: authentik
