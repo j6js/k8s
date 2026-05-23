@@ -16,8 +16,6 @@ spec:
         injector:
           securityContext:
             container:
-              runAsNonRoot: true
-              runAsUser: 100
               capabilities:
                 add:
                   - IPC_LOCK
