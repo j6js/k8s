@@ -26,3 +26,5 @@ spec:
     roles:
       - name: authentik
         login: true
+        passwordSecret:
+          name: cnpg-authentik
