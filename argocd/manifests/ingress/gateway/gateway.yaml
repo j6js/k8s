@@ -26,7 +26,7 @@ apiVersion: externaldns.k8s.io/v1alpha1
 kind: DNSEndpoint
 metadata:
   name: authentik
-  namespace: vaulg
+  namespace: vault
 spec:
   endpoints:
     - dnsName: auth.j6js.com
