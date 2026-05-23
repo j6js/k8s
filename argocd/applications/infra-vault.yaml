@@ -27,7 +27,7 @@ spec:
             tag: 2.0.1
             pullPolicy: IfNotPresent
           securityContext:
-            pod:
+            container:
               runAsNonRoot: true
               runAsUser: 100
               capabilities:
