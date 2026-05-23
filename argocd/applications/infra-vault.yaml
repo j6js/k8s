@@ -14,11 +14,6 @@ spec:
     helm:
       valuesObject:
         injector:
-          securityContext:
-            container:
-              capabilities:
-                add:
-                  - IPC_LOCK
           image:
             repository: hashicorp/vault-k8s
             tag: 1.7.4
