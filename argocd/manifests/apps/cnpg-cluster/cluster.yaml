@@ -1,0 +1,25 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: cnpg
+  namespace: cnpg
+spec:
+  instances: 3
+  storage:
+    size: 10Gi
+    storageClass: longhorn
+  superuserSecret:
+    name: cnpg-superuser
+  postgresql:
+    parameters:
+      max_connections: "200"
+      shared_buffers: "256MB"
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      cpu: "1"
+      memory: 1Gi
+  monitoring:
+    enablePodMonitor: true
