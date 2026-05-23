@@ -8,8 +8,6 @@ spec:
   storage:
     size: 10Gi
     storageClass: longhorn
-  superuserSecret:
-    name: cnpg-superuser
   postgresql:
     parameters:
       max_connections: "200"
