@@ -20,7 +20,7 @@ spec:
          error_reporting:
            enabled: true
          existingSecret:
-           name: authentik
+           name: authentik-generated
        server:
          route:
            main:
