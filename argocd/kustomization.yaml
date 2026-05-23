@@ -10,6 +10,7 @@ resources:
   - applications/infra-external-secrets-config.yaml
   - applications/infra-cert-manager-config.yaml
   - applications/infra-envoy-gateway-config.yaml
+  - applications/infra-cnpg.yaml
   - applications/infra-ingress-gateway.yaml
   - applications/argocd-exposure.yaml
   - applications/infra-vault-exposure.yaml
