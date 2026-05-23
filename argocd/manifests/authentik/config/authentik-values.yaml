@@ -1,0 +1,72 @@
+authentik:
+  secret_key: ""
+  log_level: info
+  error_reporting:
+    enabled: false
+  postgresql:
+    host: cnpg-rw.cnpg.svc.cluster.local
+    port: 5432
+    name: authentik
+    user: authentik
+    password: ""
+  email:
+    host: ""
+    port: 587
+    username: ""
+    password: ""
+    use_tls: true
+    use_ssl: false
+    timeout: 10
+    from: ""
+
+server:
+  replicas: 1
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      memory: 512Mi
+  nodeSelector: {}
+  tolerations: []
+
+worker:
+  replicas: 1
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      memory: 512Mi
+  nodeSelector: {}
+  tolerations: []
+
+postgresql:
+  enabled: false
+
+redis:
+  enabled: true
+  architecture: standalone
+  auth:
+    enabled: false
+  master:
+    resources:
+      requests:
+        cpu: 50m
+        memory: 64Mi
+      limits:
+        memory: 128Mi
+    nodeSelector: {}
+
+service:
+  type: ClusterIP
+  port:
+    name: http
+    port: 80
+    protocol: TCP
+    targetPort: http
+
+ingress:
+  enabled: false
+
+blueprints: []

@@ -165,3 +165,115 @@ one that knows it:
 ```bash
 vault write -f database/rotate-root/cnpg
 ```
+
+---
+
+## Authentik Setup
+
+These steps configure Vault for Authentik's SSO deployment. Run after the CNPG
+cluster is healthy and Vault's database engine is configured (steps 1–7 above).
+
+### 1. Create the Authentik database in CNPG
+
+Connect to the CNPG cluster and create the database + role:
+
+```bash
+# Get the CNPG superuser password from Vault
+export VAULT_TOKEN=<your-root-token>
+DB_PASS=$(vault read -field=password database/creds/cnpg-superuser)
+
+# Connect via psql (port-forward or from a pod in the cluster)
+PGPASSWORD="$DB_PASS" psql -h cnpg-rw.cnpg.svc.cluster.local -U postgres -d postgres -c "CREATE ROLE authentik WITH LOGIN PASSWORD 'temp-bootstrap-password';"
+PGPASSWORD="$DB_PASS" psql -h cnpg-rw.cnpg.svc.cluster.local -U postgres -d postgres -c "CREATE DATABASE authentik OWNER authentik;"
+```
+
+> **Note:** The password set here is temporary — Vault will manage it via dynamic
+> credentials after step 3 below.
+
+### 2. Create Vault policy for Authentik
+
+```bash
+vault policy write authentik - <<'EOF'
+path "secret/data/authentik/*" {
+  capabilities = ["read"]
+}
+EOF
+```
+
+### 3. Create K8s auth role for Authentik
+
+```bash
+vault write auth/kubernetes/role/authentik \
+  bound_service_account_names=external-secrets \
+  bound_service_account_namespaces=authentik \
+  policies=authentik \
+  ttl=1h
+```
+
+### 4. Add the `authentik` database role to Vault
+
+This allows Vault to generate dynamic credentials for the Authentik database:
+
+```bash
+vault write database/roles/authentik \
+  db_name=cnpg \
+  creation_statements="CREATE ROLE \"{{name}}\" WITH LOGIN PASSWORD '{{password}}' VALID UNTIL '{{expiration}}'; GRANT ALL PRIVILEGES ON DATABASE authentik TO \"{{name}}\"; GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO \"{{name}}\"; GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO \"{{name}}\";" \
+  revocation_statements="DROP ROLE IF EXISTS \"{{name}}\"" \
+  default_ttl=1h \
+  max_ttl=24h
+```
+
+Update the `allowed_roles` on the existing CNPG database config to include `authentik`:
+
+```bash
+vault write database/config/cnpg \
+  plugin_name=postgresql-database-plugin \
+  allowed_roles="cnpg-superuser,cnpg-app,authentik" \
+  connection_url="postgresql://{{username}}:{{password}}@cnpg.cnpg.svc.cluster.local:5432/postgres?sslmode=require" \
+  username="postgres" \
+  password="<current-password>" \
+  password_authentication=scram-sha-256
+```
+
+### 5. Store the Authentik secret key in Vault
+
+Generate a secret key and store it:
+
+```bash
+# Generate a random secret key
+AUTHENTIK_SECRET_KEY=$(openssl rand -base64 60 | tr -d '\n')
+
+# Store in Vault
+vault kv put secret/authentik/config secret_key="$AUTHENTIK_SECRET_KEY"
+```
+
+### 6. Store the Authentik database password in Vault
+
+```bash
+# Generate a strong password for the authentik DB user
+AUTHENTIK_DB_PASSWORD=$(openssl rand -base64 32 | tr -d '\n')
+
+# Store in Vault
+vault kv put secret/authentik/db password="$AUTHENTIK_DB_PASSWORD"
+
+# Update the actual PostgreSQL role password to match
+DB_PASS=$(vault read -field=password database/creds/cnpg-superuser)
+PGPASSWORD="$DB_PASS" psql -h cnpg-rw.cnpg.svc.cluster.local -U postgres -d postgres -c "ALTER ROLE authentik WITH PASSWORD '$AUTHENTIK_DB_PASSWORD';"
+```
+
+### 7. Verify everything
+
+```bash
+# Vault can generate dynamic credentials for authentik
+vault read database/creds/authentik
+
+# KV secrets are readable
+vault kv get secret/authentik/config
+vault kv get secret/authentik/db
+
+# ExternalSecrets in the authentik namespace should sync
+kubectl get externalsecret -n authentik
+
+# Authentik pods should come up
+kubectl get pods -n authentik
+```
