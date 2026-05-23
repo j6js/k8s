@@ -22,3 +22,13 @@ spec:
       memory: 512Mi
   monitoring:
     enablePodMonitor: true
+  managed:
+    roles:
+      - name: authentik
+        permissions:
+          - create
+          - read
+          - update
+          - delete
+        databases:
+          - name: authentik
