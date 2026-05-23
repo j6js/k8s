@@ -13,8 +13,14 @@ spec:
     targetRevision: 0.32.0
     helm:
       valuesObject:
-        image:
-          tag: 2.0.1
+        global:
+          image:
+            repository: hashicorp/vault-k8s
+            tag: 1.7.4
+            pullPolicy: IfNotPresent
+          agentImage:
+            repository: hashicorp/vault
+            tag: 2.0.1
         server:
           logLevel: debug
           dataStorage:
