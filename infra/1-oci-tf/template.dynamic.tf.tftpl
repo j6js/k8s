@@ -4,5 +4,6 @@ resource "local_file" "talconfig" {
     cluster_name      = "j6js-k8s"
     cluster_endpoint = [for name, node in local.nodes_with_ips : node.public_ipv6 if node.role != "wk"][0]
     nodes            = local.nodes_with_ips
+    k8s_version = local.config.versions.k8s
   })
 }

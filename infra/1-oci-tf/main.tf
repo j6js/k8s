@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: BUSL-1.1
 
 locals {
+  config = yamldecode(file("${local.terragrunt_dir}/config/config.yaml"))
   regions_list   = tolist(yamldecode(file("${local.terragrunt_dir}/config/oci-config/regions.yaml")))
   regions        = toset(local.regions_list)
   sorted_regions = sort(local.regions_list)
@@ -67,7 +68,6 @@ locals {
       }
     ]
   ])
-  talos_config = yamldecode(file("${local.terragrunt_dir}/config/talos/talos.yaml"))
   nodes_with_ips = {
     for name, vm in local.vms :
     name => {
