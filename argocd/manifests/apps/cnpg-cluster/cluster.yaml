@@ -25,10 +25,5 @@ spec:
   managed:
     roles:
       - name: authentik
-        permissions:
-          - create
-          - read
-          - update
-          - delete
-        databases:
-          - name: authentik
+        login: true
+        createdb: true
