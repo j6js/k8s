@@ -14,25 +14,22 @@ spec:
     helm:
       releaseName: authentik
       valuesObject:
+       postgresql:
+         enabled: false
        authentik:
-         secret_key: "PleaseGenerateASecureKey"
          error_reporting:
            enabled: true
-         postgresql:
-           password: "ThisIsNotASecurePassword"
+         existingSecret:
+           name: authentik
        server:
          route:
            main:
              enabled: true
              hostnames:
-               - authentik.domain.tld
+               - auth.j6js.com
              parentRefs:
-               - name: shared-gateway
-                 namespace: default
-       postgresql:
-         enabled: true
-         auth:
-           password: "ThisIsNotASecurePassword" 
+               - name: public-gateway
+                 namespace: gateway
   destination:
     server: https://kubernetes.default.svc
     namespace: authentik
