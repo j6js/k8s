@@ -15,10 +15,10 @@ spec:
       shared_buffers: "256MB"
   resources:
     requests:
-      cpu: 250m
-      memory: 512Mi
+      cpu: 125m
+      memory: 256Mi
     limits:
-      cpu: "1"
-      memory: 1Gi
+      cpu: "250m"
+      memory: 512Mi
   monitoring:
     enablePodMonitor: true
