@@ -157,9 +157,9 @@ module "nlb_${region}" {
   backends = {
 %{ for name, vm in vms_by_region[region] ~}
     "${name}" = {
-      private_ipv4 = module.vm_${region}.private_ips["${name}"]
-      public_ipv4 = module.vm_${region}.public_ips["${name}"]
-      public_ipv6 = module.vm_${region}.public_ipv6s["${name}"]
+      instance_id  = module.vm_${region}.instance_ids["${name}"]
+      public_ipv4  = module.vm_${region}.public_ips["${name}"]
+      public_ipv6  = module.vm_${region}.public_ipv6s["${name}"]
       role = "${vm.type}"
     }
 %{ endfor ~}

@@ -4,6 +4,7 @@ metadata:
   name: daemonset-proxy
   namespace: envoy-gateway
 spec:
+  ipFamily: DualStack
   provider:
     type: Kubernetes
     kubernetes:

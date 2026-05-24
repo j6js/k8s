@@ -23,7 +23,7 @@ locals {
         listener_name = listener_name
         backend_name  = backend_name
         port          = listener.backend_port
-        ip_address    = backend.private_ipv4
+        target_id     = backend.instance_id
       }
     }
   ]...)
@@ -35,7 +35,7 @@ locals {
         listener_name = listener_name
         backend_name  = backend_name
         port          = listener.backend_port
-        ip_address    = backend.public_ipv6
+        target_id     = backend.instance_id
       }
     }
   ]...)
@@ -142,7 +142,7 @@ resource "oci_network_load_balancer_backend" "ipv4" {
   for_each                 = var.enable_ipv4_backends ? local.ipv4_backend_registrations : {}
   backend_set_name         = oci_network_load_balancer_backend_set.ipv4[each.value.listener_name].name
   network_load_balancer_id = oci_network_load_balancer_network_load_balancer.ingress.id
-  ip_address               = each.value.ip_address
+  target_id                = each.value.target_id
   port                     = each.value.port
   weight                   = 1
 }
@@ -151,7 +151,7 @@ resource "oci_network_load_balancer_backend" "ipv6" {
   for_each                 = var.enable_ipv6_backends ? local.ipv6_backend_registrations : {}
   backend_set_name         = oci_network_load_balancer_backend_set.ipv6[each.value.listener_name].name
   network_load_balancer_id = oci_network_load_balancer_network_load_balancer.ingress.id
-  ip_address               = each.value.ip_address
+  target_id                = each.value.target_id
   port                     = each.value.port
   weight                   = 1
 }
