@@ -57,6 +57,31 @@ spec:
                 secretKeyRef:
                   name: authentik-generated
                   key: AUTHENTIK_POSTGRESQL__PASSWORD
+            - name: AUTHENTIK_EMAIL__HOST
+              valueFrom:
+                secretKeyRef:
+                  name: authentik-generated
+                  key: AUTHENTIK_EMAIL__HOST
+            - name: AUTHENTIK_EMAIL__PORT
+              valueFrom:
+                secretKeyRef:
+                  name: authentik-generated
+                  key: AUTHENTIK_EMAIL__PORT
+            - name: AUTHENTIK_EMAIL__USER 
+              valueFrom:
+                secretKeyRef:
+                  name: authentik-generated
+                  key: AUTHENTIK_EMAIL__USER
+            - name: AUTHENTIK_EMAIL__PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: authentik-generated
+                  key: AUTHENTIK_EMAIL__PASSWORD
+            - name: AUTHENTIK_EMAIL__FROM
+              valueFrom:
+                secretKeyRef:
+                  name: authentik-generated
+                  key: AUTHENTIK_EMAIL__FROM
   destination:
     server: https://kubernetes.default.svc
     namespace: authentik
