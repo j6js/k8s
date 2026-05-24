@@ -11,4 +11,4 @@ spec:
       namespace: gateway
   clientIPDetection:
     xForwardedFor:
-      numTrustedHops: 0
+      numTrustedHops: 1
