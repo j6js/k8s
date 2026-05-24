@@ -82,6 +82,8 @@ spec:
                 secretKeyRef:
                   name: authentik-generated
                   key: AUTHENTIK_EMAIL__FROM
+            - name: AUTHENTIK_EMAIL__TIMEOUT
+              value: "30"
   destination:
     server: https://kubernetes.default.svc
     namespace: authentik
