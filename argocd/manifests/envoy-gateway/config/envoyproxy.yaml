@@ -23,7 +23,7 @@ spec:
                       effect: NoSchedule
       envoyService:
         type: NodePort
-        externalTrafficPolicy: Cluster
+        externalTrafficPolicy: Local
         patch:
           type: StrategicMerge
           value:
