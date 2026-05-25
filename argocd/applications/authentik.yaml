@@ -25,6 +25,15 @@ spec:
               parentRefs:
                 - name: public-gateway
                   namespace: gateway
+          metrics:
+            enabled: true
+            service:
+              type: ClusterIP
+              servicePort: 9300
+            serviceMonitor:
+              enabled: true
+              interval: 30s
+              scrapeTimeout: 3s   
         worker:
           resources:
             limits:
