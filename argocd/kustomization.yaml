@@ -13,3 +13,5 @@ resources:
   - applications/authentik.yaml
   - applications/infra-gateway.yaml
   - applications/apps.yaml
+  - applications/kube-prometheus-stack.yaml
+  - applications/kube-prometheus-stack-config.yaml
