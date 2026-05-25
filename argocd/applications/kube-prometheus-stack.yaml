@@ -32,9 +32,6 @@ spec:
           prometheusSpec:
             replicas: 2
             podAntiAffinity: hard
-            serviceMonitorSelectorNilUsesHelmValues: false
-            serviceMonitorNamespaceSelector:
-              any: true
   destination:
     server: https://kubernetes.default.svc
     namespace: o11y # Observability
