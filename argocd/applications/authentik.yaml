@@ -50,11 +50,11 @@ spec:
                 secretKeyRef:
                   name: authentik-generated
                   key: AUTHENTIK_POSTGRESQL__NAME
-            - name: AUTHENTIK_POSTGRESQL__USERNAME
+            - name: AUTHENTIK_POSTGRESQL__USER
               valueFrom:
                 secretKeyRef:
                   name: authentik-generated
-                  key: AUTHENTIK_POSTGRESQL__USERNAME
+                  key: AUTHENTIK_POSTGRESQL__USER
             - name: AUTHENTIK_POSTGRESQL__PORT
               valueFrom:
                 secretKeyRef:
@@ -75,11 +75,11 @@ spec:
                 secretKeyRef:
                   name: authentik-generated
                   key: AUTHENTIK_EMAIL__PORT
-            - name: AUTHENTIK_EMAIL__USER 
+            - name: AUTHENTIK_EMAIL__USERNAME
               valueFrom:
                 secretKeyRef:
                   name: authentik-generated
-                  key: AUTHENTIK_EMAIL__USER
+                  key: AUTHENTIK_EMAIL__USERNAME
             - name: AUTHENTIK_EMAIL__PASSWORD
               valueFrom:
                 secretKeyRef:
