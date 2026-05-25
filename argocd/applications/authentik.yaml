@@ -25,6 +25,9 @@ spec:
               parentRefs:
                 - name: public-gateway
                   namespace: gateway
+          volumeMounts:
+            - name: authentik-storage
+              mountPath: /data
         worker:
           resources:
             limits:
