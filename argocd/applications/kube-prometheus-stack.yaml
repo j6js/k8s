@@ -14,13 +14,27 @@ spec:
     helm:
       releaseName: kube-prometheus-stack
       valuesObject:
+        grafana:
+          sidecar:
+            dashboards:
+              enabled: true
+              searchNamespace: ALL
+              label: grafana_dashboard
+              labelValue: "1"
+              provider:
+                foldersFromFilesStructure: true
+            datasources:
+              enabled: true
+              searchNamespace: ALL
+              label: grafana_datasource
+              labelValue: "1"
         prometheus:
           prometheusSpec:
             replicas: 2
             podAntiAffinity: hard
             serviceMonitorSelectorNilUsesHelmValues: false
             serviceMonitorNamespaceSelector:
-              any: true   
+              any: true
   destination:
     server: https://kubernetes.default.svc
     namespace: o11y # Observability
@@ -30,7 +44,7 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
-      - ServerSideApply=true  
+      - ServerSideApply=true
     managedNamespaceMetadata:
       labels:
         pod-security.kubernetes.io/enforce: privileged
