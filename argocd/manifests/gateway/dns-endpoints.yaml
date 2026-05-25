@@ -33,3 +33,15 @@ spec:
       recordType: CNAME
       targets:
         - hl.j6js.com
+---
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: grafana
+  namespace: gateway
+spec:
+  endpoints:
+    - dnsName: grafana.j6js.com
+      recordType: CNAME
+      targets:
+        - hl.j6js.com

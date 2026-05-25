@@ -42,3 +42,15 @@ spec:
       allowedRoutes:
         namespaces:
           from: All
+    - name: grafana-https
+      protocol: HTTPS
+      port: 443
+      hostname: grafana.j6js.com
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: grafana-tls
+            kind: Secret
+      allowedRoutes:
+        namespaces:
+          from: All
