@@ -43,7 +43,43 @@ resource "helm_release" "argocd" {
         params = {
           "server.insecure" = true
         }
-      }
+      },
+      controller = {
+        metrics = {
+          enabled = true
+          serviceMonitor = {
+            enabled = true
+            interval = "30s"
+            additionalLabels = {
+              "release" = "kube-prometheus-stack"
+            }
+          }
+        },
+      },
+      server = {
+        metrics = {
+          enabled = true
+          serviceMonitor = {
+            enabled = true
+            interval = "30s"
+            additionalLabels = {
+              "release" = "kube-prometheus-stack"
+            }
+          }
+        }
+      },
+      repoServer = {
+        metrics = {
+          enabled = true
+          serviceMonitor = {
+            enabled = true
+            interval = "30s"
+            additionalLabels = {
+              "release" = "kube-prometheus-stack"
+            }
+          }
+        }
+      },
     })
   ]
 

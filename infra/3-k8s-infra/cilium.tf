@@ -7,6 +7,14 @@ resource "helm_release" "cilium" {
   chart     = "oci://quay.io/cilium/charts/cilium"
   version   = yamldecode(file("${path.module}/config/config.yaml")).versions.cilium
   values = ["${yamlencode({
+    ipv4 = {
+      enabled = true
+    },
+    ipv4NativeRoutingCIDR = "10.0.0.0/8",
+    ipv6NativeRoutingCIDR = "fd00:10::/104"
+    ipv6 = {
+      enabled = true
+    },
     ipam = {
       mode = "kubernetes"
     },
