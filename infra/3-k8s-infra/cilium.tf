@@ -10,6 +10,29 @@ resource "helm_release" "cilium" {
     ipam = {
       mode = "kubernetes"
     },
+    prometheus = {
+      enabled = true
+      serviceMonitor = {
+        enabled = true
+      }
+    },
+    operator = {
+      prometheus = {
+        enabled = true
+        serviceMonitor = {
+          enabled = true
+        }
+      }
+    },
+    hubble = {
+      enabled = true
+      metrics = {
+        enabled = ["dns","drop","tcp","flow","port-distribution","icmp","httpV2:exemplars=true;", "labelsContext=source_ip", "source_namespace", "source_workload", "destination_ip", "destination_namespace", "destination_workload", "traffic_direction"]
+        serviceMonitor = {
+          enabled = true
+      }
+      }
+    },
     kubeProxyReplacement = "true",
     k8sServiceHost       = "localhost",
     k8sServicePort       = "7445",
