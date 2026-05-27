@@ -1,0 +1,23 @@
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: SecurityPolicy
+metadata:
+  name: longhorn-ui-oidc
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: longhorn-httproute
+    namespace: longhorn-system
+  oidc:
+    provider:
+      issuer: "https://auth.j6js.com"
+      authorizationEndpoint: "https://auth.j6js.com/application/o/authorize/"
+      tokenEndpoint: "https://auth.j6js.com/application/o/token/"
+    clientIDRef:
+      name: "longhorn-ui-oidc"
+    clientSecret:
+      name: "longhorn-ui-oidc"
+    redirectURL: "https://longhorn.hl.j6js.com/oauth2/callback"
+    logoutPath: "/logout"
+    scopes: ["openid", "profile", "email"]   
+    cookieDomain: "hl.j6js.com"
