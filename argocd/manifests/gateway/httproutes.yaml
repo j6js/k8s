@@ -5,7 +5,9 @@ metadata:
   namespace: vault
 spec:
   parentRefs:
-    - name: public-gateway
+    - group: gateway.networking.k8s.io	
+      kind: Gateway
+      name: public-gateway
       namespace: gateway
       sectionName: vault-https
   hostnames:
@@ -26,7 +28,9 @@ metadata:
   namespace: argocd
 spec:
   parentRefs:
-    - name: public-gateway
+    - group: gateway.networking.k8s.io	
+      kind: Gateway
+      name: public-gateway
       namespace: gateway
       sectionName: argocd-https
   hostnames:
@@ -47,7 +51,9 @@ metadata:
   namespace: authentik
 spec:
   parentRefs:
-    - name: public-gateway
+    - group: gateway.networking.k8s.io	
+      kind: Gateway
+      name: public-gateway
       namespace: gateway
       sectionName: authentik-https
   hostnames:
@@ -68,7 +74,9 @@ metadata:
   namespace: o11y
 spec:
   parentRefs:
-    - name: public-gateway
+    - group: gateway.networking.k8s.io	
+      kind: Gateway
+      name: public-gateway
       namespace: gateway
       sectionName: grafana-https
   hostnames:

@@ -13,7 +13,8 @@ spec:
       tls:
         mode: Terminate
         certificateRefs:
-          - name: vault-tls
+          - group: ''
+            name: vault-tls
             kind: Secret
       allowedRoutes:
         namespaces:
@@ -25,7 +26,8 @@ spec:
       tls:
         mode: Terminate
         certificateRefs:
-          - name: argocd-tls
+          - group: ''
+            name: argocd-tls
             kind: Secret
       allowedRoutes:
         namespaces:
@@ -37,7 +39,8 @@ spec:
       tls:
         mode: Terminate
         certificateRefs:
-          - name: authentik-tls
+          - group: ''
+            name: authentik-tls
             kind: Secret
       allowedRoutes:
         namespaces:
@@ -49,7 +52,8 @@ spec:
       tls:
         mode: Terminate
         certificateRefs:
-          - name: grafana-tls
+          - group: ''
+            name: grafana-tls
             kind: Secret
       allowedRoutes:
         namespaces:
@@ -61,7 +65,8 @@ spec:
       tls:
         mode: Terminate
         certificateRefs:
-          - name: longhorn-ui-tls
+          - group: ''
+            name: longhorn-ui-tls
             kind: Secret 
       allowedRoutes:
         namespaces:

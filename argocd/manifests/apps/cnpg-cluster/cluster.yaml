@@ -25,6 +25,9 @@ spec:
   managed:
     roles:
       - name: authentik
+        connectionLimit: -1	
+        ensure: present	
+        inherit: true
         login: true
         passwordSecret:
           name: cnpg-authentik

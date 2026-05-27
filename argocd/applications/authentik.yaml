@@ -23,7 +23,9 @@ spec:
               hostnames:
                 - auth.j6js.com
               parentRefs:
-                - name: public-gateway
+                - group: gateway.networking.k8s.io	
+                  kind: Gateway
+                  name: public-gateway
                   namespace: gateway
           metrics:
             enabled: true
