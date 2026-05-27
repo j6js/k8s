@@ -15,6 +15,15 @@ spec:
       releaseName: kube-prometheus-stack
       valuesObject:
         grafana:
+          persistence:
+            enabled: true
+            type: sts
+            accessModes:
+              - ReadWriteOnce
+            size: 500Mi
+            storageClassName: longhorn
+            finalizers: 
+              - kubernetes.io/pvc-protection
           sidecar:
             dashboards:
               enabled: true
