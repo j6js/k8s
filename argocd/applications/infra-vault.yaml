@@ -21,6 +21,11 @@ spec:
           agentImage:
             repository: hashicorp/vault
             tag: 2.0.1
+        serverTelemetry:
+          serviceMonitor:
+            enabled: true
+          prometheusRules:
+            enabled: true
         server:
           image:
             repository: hashicorp/vault
@@ -48,11 +53,19 @@ spec:
               setNodeId: true
               config: |
                 ui = true
-
+                
+                telemetry {
+                  prometheus_retention_time = "30s"
+                  disable_hostname = true  
+                }
+                
                 listener "tcp" {
                   tls_disable = 1
                   address = "[::]:8200"
                   cluster_address = "[::]:8201"
+                  telemetry = {
+                    unauthenticated_metrics_access = true
+                  }
                 }
 
                 storage "raft" {
@@ -131,4 +144,4 @@ spec:
       - CreateNamespace=true
     managedNamespaceMetadata:
       labels:
-        pod-security.kubernetes.io/enforce: privileged
+        pod-security.kubernetes.io/enforce: privileged # Vault 2.0 requires the IPC_LOCK thingy again, and PodSecurity doesn't like that in the default "restricted" mode. Waiting until the helm chart is actually updated (thanks HashiCorp).
