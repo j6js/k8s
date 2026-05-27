@@ -13,7 +13,7 @@ spec:
     targetRevision: "0.28.2"
   destination:
     server: https://kubernetes.default.svc
-    namespace: cnpg-system
+    namespace: cnpg
   syncPolicy:
     automated:
       prune: true
