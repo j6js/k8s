@@ -10,8 +10,6 @@ resource "helm_release" "cilium" {
     ipv4 = {
       enabled = true
     },
-    ipv4NativeRoutingCIDR = "10.0.0.0/8",
-    ipv6NativeRoutingCIDR = "fd00:10::/104"
     ipv6 = {
       enabled = true
     },
@@ -35,10 +33,10 @@ resource "helm_release" "cilium" {
     hubble = {
       enabled = true
       metrics = {
-        enabled = ["dns","drop","tcp","flow","port-distribution","icmp","httpV2:exemplars=true;", "labelsContext=source_ip", "source_namespace", "source_workload", "destination_ip", "destination_namespace", "destination_workload", "traffic_direction"]
+        enabled = ["dns", "drop", "tcp", "flow", "port-distribution", "icmp", "httpV2:exemplars=true;", "labelsContext=source_ip", "source_namespace", "source_workload", "destination_ip", "destination_namespace", "destination_workload", "traffic_direction"]
         serviceMonitor = {
           enabled = true
-      }
+        }
       }
     },
     kubeProxyReplacement = "true",

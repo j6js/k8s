@@ -4,7 +4,7 @@ endpoint: "https://[${cluster_endpoint}]:6443"
 imageFactory:
   registryURL: "factory.talos.dev"
   schematicEndpoint: "/schematics"
-  protocol: "http"
+  protocol: "https"
   installerURLTmpl: "{{.RegistryURL}}/oracle-installer/{{.ID}}:{{.Version}}"
 
 patches:
@@ -13,6 +13,21 @@ patches:
       network:
         cni:
           name: none
+        podSubnets:
+          - 10.244.0.0/16
+          - fd00:10:244::/48
+        serviceSubnets:
+          - 10.96.0.0/12
+          - fd00:10:96::/112
+      apiServer:
+        extraArgs:
+          service-cluster-ip-range: 10.96.0.0/12,fd00:10:96::/112
+      controllerManager:
+        extraArgs:
+          cluster-cidr: 10.244.0.0/16,fd00:10:244::/48
+          service-cluster-ip-range: 10.96.0.0/12,fd00:10:96::/112
+          node-cidr-mask-size-ipv4: "24"
+          node-cidr-mask-size-ipv6: "64"
       proxy:
         disabled: true
     machine:
@@ -62,7 +77,7 @@ controlPlane:
             - interface: eth0
               dhcp: true
 
-talosVersion: v1.13.2
+talosVersion: v1.13.3
 
 additionalApiServerCertSans:
   - "${cluster_endpoint}"
