@@ -3,6 +3,7 @@ kind: Kustomization
 resources:
   - applications/infra-longhorn.yaml
   - applications/infra-cert-manager.yaml
+  - applications/infra-cnpg.yaml
   - applications/infra-envoy-gateway.yaml
   - applications/infra-vault.yaml
   - applications/infra-external-secrets.yaml
