@@ -4,3 +4,5 @@ resources:
   - gatewayclass.yaml
   - envoyproxy.yaml
   - clienttrafficpolicy.yaml
+  - security-policies.yaml
+  - external-secrets.yaml
