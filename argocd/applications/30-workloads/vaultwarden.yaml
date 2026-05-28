@@ -17,16 +17,6 @@ spec:
         replicas: 2
         image:
           extraVarsSecret: vaultwarden-generated
-        pushNotifications:
-          enabled: true
-          existingSecret: vaultwarden-generated
-          installationId:
-            existingSecretKey: installation_id
-          installationKey:
-            existingSecretKey: installation_key
-          # defaults to US region, set relayUri and identityUri if EU region is used, etc
-          # relayUri: https://push.bitwarden.eu # defaults to https://push.bitwarden.com
-          # identityUri: https://identity.bitwarden.eu # defaults to https://identity.bitwarden.com
   destination:
     server: https://kubernetes.default.svc
     namespace: default
