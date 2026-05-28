@@ -29,6 +29,13 @@ spec:
           existingSecret: n8n-generated
         config:
           timezone: UTC
+          extraEnv:
+            - name: N8N_EDITOR_BASE_URL
+              value: https://n8n.j6js.com
+            - name: N8N_PROXY_HOPS
+              value: "1"
+        webhook:
+          url: https://n8n.j6js.com
   destination:
     server: https://kubernetes.default.svc
     namespace: n8n
