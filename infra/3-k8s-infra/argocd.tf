@@ -36,9 +36,23 @@ resource "helm_release" "argocd" {
     yamlencode({
       configs = {
         cm = {
-          url                   = yamldecode(file("${path.module}/config/config.yaml")).argocd.externalUrl
-          "commit.author.name"  = "ArgoCD Bot"
-          "commit.author.email" = "argocd@hl.j6js.com"
+          url                                                      = yamldecode(file("${path.module}/config/config.yaml")).argocd.externalUrl
+          "commit.author.name"                                     = "ArgoCD Bot"
+          "commit.author.email"                                    = "argocd@hl.j6js.com"
+          "resource.customizations.health.argoproj.io_Application" = <<-EOT
+            hs = {}
+            hs.status = "Progressing"
+            hs.message = ""
+            if obj.status ~= nil then
+              if obj.status.health ~= nil then
+                hs.status = obj.status.health.status
+                if obj.status.health.message ~= nil then
+                  hs.message = obj.status.health.message
+                end
+              end
+            end
+            return hs
+          EOT
         }
         params = {
           "server.insecure" = true
@@ -48,7 +62,7 @@ resource "helm_release" "argocd" {
         metrics = {
           enabled = true
           serviceMonitor = {
-            enabled = true
+            enabled  = true
             interval = "30s"
             additionalLabels = {
               "release" = "kube-prometheus-stack"
@@ -60,7 +74,7 @@ resource "helm_release" "argocd" {
         metrics = {
           enabled = true
           serviceMonitor = {
-            enabled = true
+            enabled  = true
             interval = "30s"
             additionalLabels = {
               "release" = "kube-prometheus-stack"
@@ -72,7 +86,7 @@ resource "helm_release" "argocd" {
         metrics = {
           enabled = true
           serviceMonitor = {
-            enabled = true
+            enabled  = true
             interval = "30s"
             additionalLabels = {
               "release" = "kube-prometheus-stack"

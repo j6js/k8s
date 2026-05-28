@@ -1,18 +1,8 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - applications/infra-longhorn.yaml
-  - applications/infra-cert-manager.yaml
-  - applications/infra-cnpg.yaml
-  - applications/infra-envoy-gateway.yaml
-  - applications/infra-vault.yaml
-  - applications/infra-external-secrets.yaml
-  - applications/infra-external-secrets-config.yaml
-  - applications/infra-cert-manager-config.yaml
-  - applications/infra-envoy-gateway-config.yaml
-  - applications/authentik-config.yaml
-  - applications/authentik.yaml
-  - applications/infra-gateway.yaml
-  - applications/apps.yaml
-  - applications/kube-prometheus-stack.yaml
-  - applications/kube-prometheus-stack-config.yaml
+  - applications/00-platform-crds
+  - applications/10-platform-services
+  - applications/20-platform-config
+  - applications/30-workloads
+  - applications/40-routing
