@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: authentik-config
+  name: vaultwarden-config
   namespace: argocd
   annotations:
     argocd.argoproj.io/sync-wave: "10"
