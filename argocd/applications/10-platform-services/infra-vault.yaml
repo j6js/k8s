@@ -43,6 +43,7 @@ spec:
           dataStorage:
             enabled: true
             storageClass: longhorn
+            size: 1Gi
           standalone:
             enabled: false
           ha:
