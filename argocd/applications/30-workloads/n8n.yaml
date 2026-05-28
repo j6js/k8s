@@ -24,7 +24,7 @@ spec:
           enabled: false
         persistence:
           enabled: true
-          size: 10Gi
+          size: 2Gi
           storageClassName: longhorn
         secretRefs:
           existingSecret: n8n-generated
