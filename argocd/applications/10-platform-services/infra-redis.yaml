@@ -8,9 +8,9 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: registry-1.docker.io/bitnamicharts
+    repoURL: docker.io/bitnamicharts
     chart: redis
-    targetRevision: 20.10.0
+    targetRevision: 25.5.3
     helm:
       releaseName: redis
       valuesObject:
