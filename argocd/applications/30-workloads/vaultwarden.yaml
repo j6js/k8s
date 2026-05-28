@@ -16,21 +16,7 @@ spec:
       valuesObject:
         replicas: 2
         image:
-          extraVars:
-            - name: PGUSER 
-              valueFrom:
-                secretKeyRef:
-                  name: vaultwarden-generated
-                  key: username
-            - name: PGPASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: vaultwarden-generated
-                  key: password
-            - name: DATABASE_URL
-              value: postgres://:@cnpg-rw.cnpg.svc.cluster.local:%!s(float64=5432)/vaultwarden
-            - name: PGPORT
-              value: "5432"
+          extraVarsSecret: vault-generated
         pushNotifications:
           enabled: true
           existingSecret: vaultwarden-generated
