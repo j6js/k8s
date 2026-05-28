@@ -1,0 +1,41 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: n8n
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "10"
+spec:
+  project: default
+  source:
+    repoURL: ghcr.io/n8n-io/n8n-helm-chart
+    chart: n8n
+    targetRevision: "1.5.0"
+    helm:
+      releaseName: n8n
+      valuesObject:
+        queueMode:
+          enabled: false
+        replicaCount: 1
+        strategy:
+          type: Recreate
+        ingress:
+          enabled: false
+        persistence:
+          enabled: true
+          size: 10Gi
+          storageClassName: longhorn
+        secretRefs:
+          existingSecret: n8n-generated
+        config:
+          timezone: UTC
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: n8n
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
