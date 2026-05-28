@@ -277,3 +277,69 @@ kubectl get externalsecret -n authentik
 # Authentik pods should come up
 kubectl get pods -n authentik
 ```
+
+---
+
+## n8n and Redis Setup
+
+These manifests expect External Secrets to read three KV paths from the `secrets`
+KV v2 mount:
+
+- `secrets/n8n`
+- `secrets/cnpg/role/n8n`
+- `secrets/redis/shared`
+
+Create the backing secrets:
+
+```bash
+N8N_ENCRYPTION_KEY=$(openssl rand -hex 32)
+N8N_DB_PASSWORD=$(openssl rand -base64 32 | tr -d '\n')
+REDIS_PASSWORD=$(openssl rand -base64 32 | tr -d '\n')
+
+vault kv put secrets/n8n \
+  N8N_ENCRYPTION_KEY="$N8N_ENCRYPTION_KEY" \
+  N8N_HOST="n8n.j6js.com" \
+  N8N_PORT="5678" \
+  N8N_PROTOCOL="http"
+
+vault kv put secrets/cnpg/role/n8n \
+  username="n8n" \
+  password="$N8N_DB_PASSWORD"
+
+vault kv put secrets/redis/shared \
+  password="$REDIS_PASSWORD"
+```
+
+Allow the `vault-backend` ClusterSecretStore role to read those paths. When
+updating the Kubernetes auth role, preserve any other policies already attached
+to it:
+
+```bash
+vault policy write external-secrets-kv - <<'EOF'
+path "secrets/data/n8n" {
+  capabilities = ["read"]
+}
+
+path "secrets/data/cnpg/role/n8n" {
+  capabilities = ["read"]
+}
+
+path "secrets/data/redis/shared" {
+  capabilities = ["read"]
+}
+EOF
+
+vault write auth/kubernetes/role/cnpg-superuser \
+  bound_service_account_names=external-secrets \
+  bound_service_account_namespaces=external-secrets \
+  policies=<existing-policies>,external-secrets-kv \
+  ttl=1h
+```
+
+Verify the generated Kubernetes secrets after Argo syncs:
+
+```bash
+kubectl get externalsecret -n cnpg cnpg-n8n
+kubectl get externalsecret -n redis redis-auth
+kubectl get externalsecret -n n8n n8n-generated n8n-db-secrets redis-auth
+```

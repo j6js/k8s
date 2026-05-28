@@ -4,4 +4,5 @@ resources:
   - infra-cert-manager-config.yaml
   - infra-envoy-gateway-config.yaml
   - infra-external-secrets-config.yaml
+  - infra-redis-config.yaml
   - kube-prometheus-stack-config.yaml

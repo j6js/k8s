@@ -4,7 +4,7 @@ metadata:
   name: n8n
   namespace: argocd
   annotations:
-    argocd.argoproj.io/sync-wave: "10"
+    argocd.argoproj.io/sync-wave: "20"
 spec:
   project: default
   source:
@@ -15,7 +15,8 @@ spec:
       releaseName: n8n
       valuesObject:
         queueMode:
-          enabled: false
+          enabled: true
+          workerReplicaCount: 1
         replicaCount: 1
         strategy:
           type: Recreate
@@ -27,11 +28,28 @@ spec:
           storageClassName: longhorn
         secretRefs:
           existingSecret: n8n-generated
+        database:
+          type: postgresdb
+          useExternal: true
+          host: cnpg-rw.cnpg.svc.cluster.local
+          port: 5432
+          database: n8n
+          schema: public
+          user: n8n
+          passwordSecret:
+            name: n8n-db-secrets
+            key: password
+        redis:
+          enabled: true
+          useExternal: true
+          host: redis-master.redis.svc.cluster.local
+          port: 6379
+          passwordSecret:
+            name: redis-auth
+            key: password
         config:
           timezone: UTC
           extraEnv:
-            - name: N8N_EDITOR_BASE_URL
-              value: https://n8n.j6js.com
             - name: N8N_PROXY_HOPS
               value: "1"
         webhook:
