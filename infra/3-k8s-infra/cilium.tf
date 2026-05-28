@@ -5,7 +5,7 @@ resource "helm_release" "cilium" {
   name      = "cilium"
   namespace = "kube-system"
   chart     = "oci://quay.io/cilium/charts/cilium"
-  version   = yamldecode(file("${path.module}/config/config.yaml")).versions.cilium
+  version   = "1.19.4"
   values = ["${yamlencode({
     ipv4 = {
       enabled = true

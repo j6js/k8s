@@ -17,7 +17,7 @@ resource "helm_release" "external_dns" {
   namespace     = "external-dns"
   repository    = "https://kubernetes-sigs.github.io/external-dns/"
   chart         = "external-dns"
-  version       = yamldecode(file("${path.module}/config/config.yaml")).versions.external-dns
+  version       = "1.21.1"
   wait          = true
   wait_for_jobs = true
   values = ["${yamlencode({

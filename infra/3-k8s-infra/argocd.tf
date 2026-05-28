@@ -30,7 +30,7 @@ resource "helm_release" "argocd" {
   repository = "oci://ghcr.io/argoproj/argo-helm"
   chart      = "argo-cd"
   namespace  = kubernetes_namespace_v1.argocd_system.metadata[0].name
-  version    = yamldecode(file("${path.module}/config/config.yaml")).versions.argocd
+  version    = "9.5.15"
 
   values = [
     yamlencode({
