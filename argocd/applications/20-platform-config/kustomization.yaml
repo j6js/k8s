@@ -6,3 +6,4 @@ resources:
   - infra-external-secrets-config.yaml
   - infra-redis-config.yaml
   - kube-prometheus-stack-config.yaml
+  - infra-longhorn-config.yaml
