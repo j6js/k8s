@@ -16,7 +16,7 @@ spec:
       valuesObject:
         replicas: 2
         image:
-          extraVarsSecret: vault-generated
+          extraVarsSecret: vaultwarden-generated
         pushNotifications:
           enabled: true
           existingSecret: vaultwarden-generated
