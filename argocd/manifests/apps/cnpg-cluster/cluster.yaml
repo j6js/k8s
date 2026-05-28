@@ -38,3 +38,10 @@ spec:
         login: true
         passwordSecret:
           name: cnpg-n8n
+      - name: vaultwarden
+        connectionLimit: -1
+        ensure: present
+        inherit: true
+        login: true
+        passwordSecret:
+          name: cnpg-vaultwarden
