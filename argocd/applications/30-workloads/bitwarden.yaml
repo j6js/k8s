@@ -22,6 +22,8 @@ spec:
         general:
           domain: bw.j6js.com
           databaseProvider: postgres
+          ingress:
+            enabled: false # GatewayAPI is used instead of ingress-nginx, see the next line
           gateway:
             enabled: true
             parentRefs:
