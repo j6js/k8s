@@ -41,15 +41,15 @@ spec:
           volume:
             logs:
               enabled: true
-          component:
-            api:
-              image:
-                repository: ghcr.io/j6js/api
-                tag: latest
-            identity:
-              image:
-                repository: ghcr.io/j6js/identity
-                tag: latest
+      component:
+        api:
+          image:
+            repository: ghcr.io/j6js/api
+            tag: latest
+        identity:
+          image:
+            repository: ghcr.io/j6js/identity
+            tag: latest
   destination:
     server: https://kubernetes.default.svc
     namespace: default
