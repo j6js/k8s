@@ -22,10 +22,12 @@ variable "vcn_id" {
 variable "backends" {
   description = "Regional backend nodes keyed by node name."
   type = map(object({
-    instance_id  = string
-    public_ipv4  = string
-    public_ipv6  = string
-    role         = string
+    instance_id     = string
+    private_ipv4_id = string
+    ipv6_id         = string
+    public_ipv4     = string
+    public_ipv6     = string
+    role            = string
   }))
 }
 

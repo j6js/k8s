@@ -157,10 +157,12 @@ module "nlb_${region}" {
   backends = {
 %{ for name, vm in vms_by_region[region] ~}
     "${name}" = {
-      instance_id  = module.vm_${region}.instance_ids["${name}"]
-      public_ipv4  = module.vm_${region}.public_ips["${name}"]
-      public_ipv6  = module.vm_${region}.public_ipv6s["${name}"]
-      role = "${vm.type}"
+      instance_id     = module.vm_${region}.instance_ids["${name}"]
+      private_ipv4_id = module.vm_${region}.private_ip_ids["${name}"]
+      ipv6_id         = module.vm_${region}.ipv6_ids["${name}"]
+      public_ipv4     = module.vm_${region}.public_ips["${name}"]
+      public_ipv6     = module.vm_${region}.public_ipv6s["${name}"]
+      role            = "${vm.type}"
     }
 %{ endfor ~}
   }

@@ -23,7 +23,7 @@ locals {
         listener_name = listener_name
         backend_name  = backend_name
         port          = listener.backend_port
-        target_id     = backend.instance_id
+        target_id     = backend.private_ipv4_id
       }
     }
   ]...)
@@ -35,7 +35,7 @@ locals {
         listener_name = listener_name
         backend_name  = backend_name
         port          = listener.backend_port
-        target_id     = backend.instance_id
+        target_id     = backend.ipv6_id
       }
     }
   ]...)
@@ -73,7 +73,7 @@ resource "oci_core_network_security_group_security_rule" "nlb_ingress" {
 
 resource "oci_core_network_security_group_security_rule" "nlb_egress" {
   for_each = {
-    for item in setproduct(keys(var.listeners), ["10.0.0.0/8"]) :
+    for item in setproduct(keys(var.listeners), local.vcn_cidrs) :
     "${item[0]}-${replace(item[1], "/", "_")}" => {
       listener = var.listeners[item[0]]
       cidr     = item[1]

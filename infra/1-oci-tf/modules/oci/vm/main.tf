@@ -6,8 +6,8 @@ data "oci_identity_availability_domains" "this" {
 }
 
 data "oci_identity_fault_domains" "this" {
-    availability_domain = data.oci_identity_availability_domains.this.availability_domains[0].name
-    compartment_id = var.compartment_ocid
+  availability_domain = data.oci_identity_availability_domains.this.availability_domains[0].name
+  compartment_id      = var.compartment_ocid
 }
 locals {
   roles = ["cp", "sh", "wk"]
@@ -210,10 +210,18 @@ output "private_ips" {
   value = { for k, v in oci_core_instance.vm : k => v.private_ip }
 }
 
+output "private_ip_ids" {
+  value = { for k, v in data.oci_core_private_ips.privip : k => v.private_ips[0].id }
+}
+
 output "public_ips" {
   value = { for k, v in oci_core_public_ip.vm : k => v.ip_address }
 }
 
 output "public_ipv6s" {
   value = { for k, v in oci_core_ipv6.vm : k => v.ip_address }
+}
+
+output "ipv6_ids" {
+  value = { for k, v in oci_core_ipv6.vm : k => v.id }
 }
