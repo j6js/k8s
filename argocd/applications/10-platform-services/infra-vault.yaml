@@ -143,6 +143,14 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+      - ServerSideApply=true
+      - RespectIgnoreDifferences=true
     managedNamespaceMetadata:
       labels:
         pod-security.kubernetes.io/enforce: privileged # Vault 2.0 requires the IPC_LOCK thingy again, and PodSecurity doesn't like that in the default "restricted" mode. Waiting until the helm chart is actually updated (thanks HashiCorp).
+  ignoreDifferences:
+    - group: admissionregistration.k8s.io
+      kind: MutatingWebhookConfiguration
+      name: vault-injector-webhook-config
+      jsonPointers:
+      - '.webhooks.[].clientConfig.caBundle'

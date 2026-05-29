@@ -62,3 +62,11 @@ spec:
     syncOptions:
       - CreateNamespace=true
       - ServerSideApply=true
+      - RespectIgnoreDifferences=true
+  ignoreDifferences:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: bitwarden-self-host-httproute
+      jsonPointers:
+      - '.spec.parentRefs[].group' 
+      - '.spec.parentRefs[].kind'
