@@ -79,12 +79,12 @@ spec:
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: vaultwarden-tls
+  name: bitwarden-tls
   namespace: gateway
 spec:
-  secretName: vaultwarden-tls
+  secretName: bitwarden-tls
   dnsNames:
-    - vw.j6js.com
+    - bw.j6js.com
   issuerRef:
     name: letsencrypt
     kind: ClusterIssuer

@@ -84,10 +84,10 @@ spec:
       allowedRoutes:
         namespaces:
           from: All
-    - name: vaultwarden-https
+    - name: bitwarden-https
       protocol: HTTPS
       port: 443
-      hostname: vw.j6js.com
+      hostname: bw.j6js.com
       tls:
         mode: Terminate
         certificateRefs:

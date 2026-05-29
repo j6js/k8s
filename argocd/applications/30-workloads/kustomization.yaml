@@ -6,5 +6,5 @@ resources:
   - authentik.yaml
   - n8n-config.yaml
   - n8n.yaml
-  - vaultwarden.yaml
-  - vaultwarden-config.yaml
+  - bitwarden.yaml
+  - bitwarden-config.yaml

@@ -73,11 +73,11 @@ spec:
 apiVersion: externaldns.k8s.io/v1alpha1
 kind: DNSEndpoint
 metadata:
-  name: vaultwarden
+  name: bitwarden
   namespace: gateway
 spec:
   endpoints:
-    - dnsName: vw.j6js.com
+    - dnsName: bw.j6js.com
       recordType: CNAME
       targets:
         - hl.j6js.com

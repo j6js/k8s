@@ -1,0 +1,55 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: bitwarden
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "20"
+spec:
+  project: default
+  source:
+    repoURL: https://charts.bitwarden.com/
+    chart: self-host
+    targetRevision: "1.1.12"
+    helm:
+      releaseName: bitwarden
+      valuesObject:
+        general:
+          domain: bw.j6js.com
+          databaseProvider: postgres
+          gateway:
+            enabled: true
+            parentRefs:
+              - group: gateway.networking.k8s.io
+                kind: Gateway
+                name: public-gateway
+                namespace: gateway
+                sectionName: bitwarden-https
+          email:
+            replyToEmail: "noreply@j6js.com" # same as sender
+            smtpHost: "smtp.mailgun.org"
+            smtpPort: 587
+            smtpStartTls: true
+          refreshTokens.enabled: true
+          sharedStorageClassName: longhorn-rwx
+          secrets.secretName: bitwarden-generated
+          volume.logs.enabled: true
+          component:
+            api:
+              image:
+                repository: ghcr.io/j6js/api
+                tag: latest
+            identity:
+              image:
+                repository: ghcr.io/j6js/identity
+                tag: latest
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true

@@ -1,10 +1,10 @@
 apiVersion: postgresql.cnpg.io/v1
 kind: Database
 metadata:
-  name: vaultwarden
+  name: bitwarden
   namespace: cnpg
 spec:
-  name: vaultwarden
-  owner: vaultwarden
+  name: bitwarden
+  owner: bitwarden
   cluster:
     name: cnpg
