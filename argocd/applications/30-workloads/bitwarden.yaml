@@ -16,6 +16,8 @@ spec:
       valuesObject:
         secrets:
           secretName: bitwarden-generated
+        database:
+          enabled: false # disables default MSSQL, postgres is better
         general:
           domain: bw.j6js.com
           databaseProvider: postgres
