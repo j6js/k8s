@@ -38,10 +38,10 @@ spec:
         login: true
         passwordSecret:
           name: cnpg-n8n
-      - name: vaultwarden
+      - name: bitwarden
         connectionLimit: -1
         ensure: present
         inherit: true
         login: true
         passwordSecret:
-          name: cnpg-vaultwarden
+          name: cnpg-bitwarden
