@@ -92,7 +92,7 @@ spec:
         mode: Terminate
         certificateRefs:
           - group: ''
-            name: vaultwarden-tls
+            name: bitwarden-tls
             kind: Secret 
       allowedRoutes:
         namespaces:
