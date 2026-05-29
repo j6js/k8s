@@ -18,6 +18,7 @@ spec:
           secretName: bitwarden-generated
         database:
           enabled: false # disables default MSSQL, postgres is better
+        sharedStorageClassName: longhorn-rwx
         general:
           domain: bw.j6js.com
           databaseProvider: postgres
@@ -35,9 +36,7 @@ spec:
             smtpPort: "587" # has to be a string for some reason
             smtpStartTls: "true" # also has to be a string
           refreshTokens:
-            enabled: true
-          sharedStorageClassName: longhorn-rwx
-          
+            enabled: true          
           volume:
             logs:
               enabled: true
