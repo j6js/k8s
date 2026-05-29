@@ -32,11 +32,6 @@ spec:
                 name: public-gateway
                 namespace: gateway
                 sectionName: bitwarden-https
-          email:
-            replyToEmail: "noreply@j6js.com" # same as sender
-            smtpHost: "smtp.mailgun.org"
-            smtpPort: "587" # has to be a string for some reason
-            smtpStartTls: "true" # also has to be a string
           refreshTokens:
             enabled: true          
           volume:
