@@ -49,9 +49,9 @@ spec:
             image:
               repository: ghcr.io/j6js/identity
               tag: latest
-          jobs:
-            cleanup:
-              enabled: false # deletes the configmap, all pods fail, why does this exist? (and why is it enabled by default?)
+        jobs:
+          cleanup:
+            enabled: false # deletes the configmap, all pods fail, why does this exist? (and why is it enabled by default?)
   destination:
     server: https://kubernetes.default.svc
     namespace: default
