@@ -29,7 +29,7 @@ spec:
             replyToEmail: "noreply@j6js.com" # same as sender
             smtpHost: "smtp.mailgun.org"
             smtpPort: 587
-            smtpStartTls: true
+            smtpStartTls: "true" # has to be a string for some reason
           refreshTokens.enabled: true
           sharedStorageClassName: longhorn-rwx
           secrets.secretName: bitwarden-generated
