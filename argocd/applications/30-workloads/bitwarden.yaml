@@ -37,8 +37,6 @@ spec:
             smtpHost: "smtp.mailgun.org"
             smtpPort: "465" # has to be a string for some reason
             smtpSsl: "true" # also has to be a string
-          refreshTokens:
-            enabled: true          
           volume:
             logs:
               enabled: true
