@@ -50,6 +50,7 @@ resource "kubernetes_secret_v1" "cloudflare_api_token" {
   data = {
     apiKey = data.sops_file.cloudflare.data["apiToken"]
   }
+  depends_on = [kubernetes_namespace_v1.external_dns]
 }
 resource "kubectl_manifest" "regional_dns_endpoint" {
   for_each = local.nlb_info

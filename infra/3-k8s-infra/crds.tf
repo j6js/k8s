@@ -11,7 +11,7 @@
 locals {
     gateway_api_version = "1.5.1"
     gateway_api_url     = "https://github.com/kubernetes-sigs/gateway-api/releases/download/v${local.gateway_api_version}/experimental-install.yaml"
-    gateway_api_manifest = provider::kubernetes::manifest_decode_multi(data.http.gateway_api_raw.body)
+    gateway_api_manifest = provider::kubernetes::manifest_decode_multi(data.http.gateway_api_raw.response_body)
 }
 
 data "http" "gateway_api_raw" {
@@ -25,25 +25,14 @@ resource "helm_release" "o11y_crds" {
 }
 
 resource "kubernetes_manifest" "gateway_api_crds" {
-    for_each = { for item in local.gateway_api_manifest : item.metadata.name => item }
-    manifest = each.value
+    for_each = {
+        for manifest in local.gateway_api_manifest : 
+        "${manifest.kind}--${manifest.metadata.name}" => manifest
+    }
+    # status removed because the provider doesn't like it, and it's not needed for the CRD to be applied
+    manifest = { for k, v in each.value : k => v if k != "status" }
 }
 
-resource "helm_release" "envoy_gateway_crds" {
-    name    = "envoy-gateway-crds"
-    chart   = "oci://docker.io/envoyproxy/gateway-crds-helm"
-    version = "v0.0.0-latest" # interesting versioning scheme
-    values = {
-        crds = {
-            envoyGateway = {
-                enabled = true
-            }
-            gatewayApi = {
-                enabled = false # we do this ourselves, see line 5-9 and 21-24
-            }
-        }
-    }
-}
 resource "null_resource" "wait_for_crds" {
-    depends_on = [helm_release.o11y_crds, kubernetes_manifest.gateway_api_crds, helm_release.envoy_gateway_crds]
+    depends_on = [helm_release.o11y_crds, kubernetes_manifest.gateway_api_crds]
 }
