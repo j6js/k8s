@@ -33,17 +33,3 @@ spec:
         login: true
         passwordSecret:
           name: cnpg-authentik
-      - name: n8n
-        connectionLimit: -1
-        ensure: present
-        inherit: true
-        login: true
-        passwordSecret:
-          name: cnpg-n8n
-      - name: bitwarden
-        connectionLimit: -1
-        ensure: present
-        inherit: true
-        login: true
-        passwordSecret:
-          name: cnpg-bitwarden
