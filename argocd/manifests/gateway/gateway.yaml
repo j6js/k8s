@@ -1,0 +1,86 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: public-gateway
+  namespace: gateway
+spec:
+  gatewayClassName: envoy
+  listeners:
+    - name: vault-https
+      protocol: HTTPS
+      port: 443
+      hostname: vault.j6js.com
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - group: ''
+            name: vault-tls
+            kind: Secret
+      allowedRoutes:
+        namespaces:
+          from: All
+    - name: argocd-https
+      protocol: HTTPS
+      port: 443
+      hostname: argo.j6js.com
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - group: ''
+            name: argocd-tls
+            kind: Secret
+      allowedRoutes:
+        namespaces:
+          from: All
+    - name: authentik-https
+      protocol: HTTPS
+      port: 443
+      hostname: auth.j6js.com
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - group: ''
+            name: authentik-tls
+            kind: Secret
+      allowedRoutes:
+        namespaces:
+          from: All
+    - name: grafana-https
+      protocol: HTTPS
+      port: 443
+      hostname: grafana.j6js.com
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - group: ''
+            name: grafana-tls
+            kind: Secret
+      allowedRoutes:
+        namespaces:
+          from: All
+    - name: longhorn-ui-https
+      protocol: HTTPS
+      port: 443
+      hostname: longhorn.hl.j6js.com
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - group: ''
+            name: longhorn-ui-tls
+            kind: Secret 
+      allowedRoutes:
+        namespaces:
+          from: All
+    - name: bitwarden-https
+      protocol: HTTPS
+      port: 443
+      hostname: bw.j6js.com
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - group: ''
+            name: bitwarden-tls
+            kind: Secret 
+      allowedRoutes:
+        namespaces:
+          from: All

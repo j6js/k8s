@@ -1,0 +1,20 @@
+version: "3"
+
+includes:
+  infra:
+    taskfile: ./infra/Taskfile.yaml
+    dir: ./infra
+
+tasks:
+  test:
+    desc: "Tests and/or Validates Code and Config across whole repo"
+    cmds:
+      - task: "infra:test"
+  bootstrap:
+    desc: "Bootstraps all required components across whole repo (stdin/input *may* be required)"
+    cmds:
+      - task: "infra:bootstrap"
+  deploy:
+    desc: "Applies changes and/or Upgrades components across whole repo"
+    cmds:
+      - task: "infra:deploy"

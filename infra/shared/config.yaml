@@ -1,0 +1,10 @@
+dns:
+  baseDomain: j6js.com
+arch: arm64
+versions:
+  talos: 1.13.3
+  k8s: 1.36.1
+argocd:
+  repoUrl: https://github.com/j6js/k8s.git
+  externalUrl: https://argo.j6js.com
+clusterName: j6js-k8s

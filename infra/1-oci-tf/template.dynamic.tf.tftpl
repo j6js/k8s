@@ -1,0 +1,11 @@
+resource "local_file" "talconfig" {
+  filename = "${terragrunt_dir}/../2-talhelper/talconfig.yaml"
+  content = templatefile("${terragrunt_dir}/talconfig.yaml.tftpl", {
+    cluster_name      = local.config.clusterName
+    cluster_endpoint = [for name, node in local.nodes_with_ips : node.public_ipv6 if node.role != "wk"][0]
+    nodes            = local.nodes_with_ips
+    kubernetes_version = local.config.versions.k8s
+    talos_version = local.config.versions.talos
+    cert_sans = local.talos_certificate_san
+  })
+}

@@ -1,0 +1,44 @@
+version: '3'
+
+tasks: 
+  test:
+    cmds:
+      - task: decrypt
+        if: '[ ! -f talsecret.yaml ]'
+      - talhelper validate talconfig
+  decrypt:
+    cmds:
+      - sops -d ../.sops/talsecret.yaml > ./talsecret.yaml
+  encrypt:
+    cmds:
+      - sops -e ./talsecret.yaml > ../.sops/talsecret.yaml
+  deploy:
+    cmds:
+      - task: decrypt
+        if: '[ ! -f talsecret.yaml ]'
+      - talhelper genconfig
+      - talhelper gencommand apply | bash
+      - task: kubeconfig
+  bootstrap:
+    desc: Bootstrap Talos Linux, etcd, and Kubernetes control plane components. (This should only be run once ALL nodes boot, and only once per cluster.)e
+    cmds:
+      - task: decrypt
+        if: '[ ! -f talsecret.yaml ]'
+      - talhelper genconfig
+      - talhelper gencommand apply --extra-flags "--insecure" | bash || talhelper gencommand apply | bash
+      - |
+        for i in {1..30}; do
+          echo "Attempt $i of 30..."
+          talhelper gencommand bootstrap | bash && echo "etcd bootstrap successful" && break || sleep 1
+          if [ $i -eq 30 ]; then
+            echo "Failed after 30 tries"
+            exit 1
+          fi
+        done
+      - task: kubeconfig
+  kubeconfig:
+    vars:
+      CP_NODE:
+        sh: "grep -B 2 -A 2 'controlPlane: true' talconfig.yaml | grep ipAddress | head -1 | awk '{print $2}'"
+    cmds:
+      - talosctl --talosconfig clusterconfig/talosconfig --nodes {{.CP_NODE}} kubeconfig config/outputs/kubeconfig

@@ -1,0 +1,17 @@
+version: '3'
+
+tasks:
+  init:
+    cmds:
+      - terraform init
+  deploy:
+    cmds:
+      - if: "[ -d .terraform ]"
+        task: init
+      - terraform apply -auto-approve
+  bootstrap:
+    cmds:
+      - task: deploy # bootstrap is the same as deploy, it's terraform after all.
+  test:
+    cmds:
+      - terraform validate

@@ -1,0 +1,10 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: bitwarden
+  namespace: cnpg
+spec:
+  name: bitwarden
+  owner: bitwarden
+  cluster:
+    name: cnpg

@@ -1,0 +1,71 @@
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: vault
+  namespace: gateway
+spec:
+  endpoints:
+    - dnsName: vault.j6js.com
+      recordType: CNAME
+      targets:
+        - hl.j6js.com
+---
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: argocd
+  namespace: gateway
+spec:
+  endpoints:
+    - dnsName: argo.j6js.com
+      recordType: CNAME
+      targets:
+        - hl.j6js.com
+---
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: authentik
+  namespace: gateway
+spec:
+  endpoints:
+    - dnsName: auth.j6js.com
+      recordType: CNAME
+      targets:
+        - hl.j6js.com
+---
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: grafana
+  namespace: gateway
+spec:
+  endpoints:
+    - dnsName: grafana.j6js.com
+      recordType: CNAME
+      targets:
+        - hl.j6js.com
+---
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: longhorn-ui
+  namespace: gateway
+spec:
+  endpoints:
+    - dnsName: longhorn.hl.j6js.com
+      recordType: CNAME
+      targets:
+        - hl.j6js.com
+---
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: bitwarden
+  namespace: gateway
+spec:
+  endpoints:
+    - dnsName: bw.j6js.com
+      recordType: CNAME
+      targets:
+        - hl.j6js.com

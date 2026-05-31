@@ -1,0 +1,103 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: vault-route
+  namespace: vault
+spec:
+  parentRefs:
+    - group: gateway.networking.k8s.io	
+      kind: Gateway
+      name: public-gateway
+      namespace: gateway
+      sectionName: vault-https
+  hostnames:
+    - vault.j6js.com
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - group: ''	
+          kind: Service	
+          name: infra-vault-active
+          port: 8200
+          weight: 1
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: argocd-route
+  namespace: argocd
+spec:
+  parentRefs:
+    - group: gateway.networking.k8s.io	
+      kind: Gateway
+      name: public-gateway
+      namespace: gateway
+      sectionName: argocd-https
+  hostnames:
+    - argo.j6js.com
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - group: ''	
+          kind: Service	
+          name: argocd-server
+          port: 80
+          weight: 1
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: authentik-route
+  namespace: authentik
+spec:
+  parentRefs:
+    - group: gateway.networking.k8s.io	
+      kind: Gateway
+      name: public-gateway
+      namespace: gateway
+      sectionName: authentik-https
+  hostnames:
+    - auth.j6js.com
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - group: ''
+          kind: Service
+          name: authentik-server
+          port: 80
+          weight: 1
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: grafana-route
+  namespace: o11y
+spec:
+  parentRefs:
+    - group: gateway.networking.k8s.io	
+      kind: Gateway
+      name: public-gateway
+      namespace: gateway
+      sectionName: grafana-https
+  hostnames:
+    - grafana.j6js.com
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - group: ''	
+          kind: Service	
+          name: kube-prometheus-stack-grafana
+          port: 80
+          weight: 1

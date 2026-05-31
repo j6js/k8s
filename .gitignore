@@ -1,0 +1,25 @@
+# Terraform/Terragrunt
+terraform.tfstate
+terraform.tfstate.backup
+terraform.tfstate.*.backup
+.terraform/
+.terragrunt-cache/
+.terraform.tfstate.lock.info
+
+# Kubernetes
+kubeconfig
+
+# Generic system-created files & junk
+.DS_Store
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.lnk
+__MACOSX/
+
+# IDEs
+.vscode/
+.idea/

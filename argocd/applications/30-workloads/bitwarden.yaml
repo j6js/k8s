@@ -1,0 +1,97 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: bitwarden
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "20"
+spec:
+  project: default
+  source:
+    repoURL: https://charts.bitwarden.com/
+    chart: self-host
+    targetRevision: "1.1.12"
+    helm:
+      releaseName: bitwarden
+      valuesObject:
+        secrets:
+          secretName: bitwarden-generated
+        database:
+          enabled: false # disables default MSSQL, postgres is better
+        sharedStorageClassName: longhorn-rwx
+        general:
+          domain: bw.j6js.com
+          databaseProvider: postgres
+          ingress:
+            enabled: false # GatewayAPI is used instead of ingress-nginx, see the next line
+          gateway:
+            enabled: true
+            parentRefs:
+              - group: gateway.networking.k8s.io
+                kind: Gateway
+                name: public-gateway
+                namespace: gateway
+                sectionName: bitwarden-https
+          email:
+            replyToEmail: "noreply@j6js.com" # same as sender
+            smtpHost: "smtp.mailgun.org"
+            smtpPort: "465" # has to be a string for some reason
+            smtpSsl: "true" # also has to be a string
+          volume:
+            logs:
+              enabled: true
+        component:
+          api:
+            image:
+              repository: ghcr.io/j6js/api
+              tag: latest
+            resources:
+              requests:
+                cpu: 100m
+                memory: 256Mi
+              limits:
+                cpu: 500m
+                memory: 1Gi
+          identity:
+            image:
+              repository: ghcr.io/j6js/identity
+              tag: latest
+            resources:
+              requests:
+                cpu: 100m
+                memory: 256Mi
+              limits:
+                cpu: 500m
+                memory: 1Gi
+          admin:
+            resources:
+              requests:
+                cpu: 50m
+                memory: 128Mi
+              limits:
+                cpu: 200m
+                memory: 512Mi
+        jobs:
+          cleanup:
+            enabled: false # deletes the configmap, all pods fail, why does this exist? (and why is it enabled by default?)
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+      - RespectIgnoreDifferences=true
+  ignoreDifferences:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: bitwarden-self-host-httproute
+      jqPathExpressions:
+        - '.spec.parentRefs[].group'
+        - '.spec.parentRefs[].kind'
+        - '.spec.rules[].backendRefs[].group'
+        - '.spec.rules[].backendRefs[].kind'
+        - '.spec.rules[].backendRefs[].weight'
