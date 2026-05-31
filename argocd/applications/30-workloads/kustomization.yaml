@@ -4,5 +4,3 @@ resources:
   - apps.yaml
   - authentik-config.yaml
   - authentik.yaml
-  - bitwarden.yaml
-  - bitwarden-config.yaml
