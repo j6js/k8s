@@ -17,6 +17,14 @@ spec:
         postgresql:
           enabled: false
         server:
+          containerSecurityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
           route:
             main:
               enabled: true
@@ -44,6 +52,14 @@ spec:
               cpu: 500m
               memory: 1Gi
         worker:
+          containerSecurityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
           resources:
             limits:
               cpu: "500m"
@@ -117,6 +133,11 @@ spec:
     automated:
       prune: true
       selfHeal: true
+    managedNamespaceMetadata:
+      labels:
+        pod-security.kubernetes.io/enforce: baseline
+        pod-security.kubernetes.io/audit: restricted
+        pod-security.kubernetes.io/warn: restricted
     syncOptions:
       - CreateNamespace=true
       - ServerSideApply=true

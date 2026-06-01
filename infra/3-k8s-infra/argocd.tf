@@ -38,6 +38,21 @@ resource "helm_release" "argocd" {
           url                                                      = yamldecode(file("${path.module}/config/config.yaml")).argocd.externalUrl
           "commit.author.name"                                     = "ArgoCD Bot"
           "commit.author.email"                                    = "argocd@hl.j6js.com"
+          "dex.config"                                             = <<-EOT
+            connectors:
+              - type: oidc
+                id: authentik
+                name: authentik
+                config:
+                  issuer: https://auth.j6js.com/application/o/argocd/
+                  clientID: argocd
+                  clientSecret: $dex.authentik.clientSecret
+                  insecureEnableGroups: true
+                  scopes:
+                    - openid
+                    - profile
+                    - email
+          EOT
           "resource.customizations.health.argoproj.io_Application" = <<-EOT
             hs = {}
             hs.status = "Progressing"
@@ -55,6 +70,19 @@ resource "helm_release" "argocd" {
         }
         params = {
           "server.insecure" = true
+        }
+        rbac = {
+          "policy.csv"     = <<-EOT
+            g, ArgoCD Admin, role:admin
+            g, ArgoCD Viewer, role:readonly
+          EOT
+          "policy.default" = ""
+          scopes           = "[groups]"
+        }
+        secret = {
+          extra = {
+            "dex.authentik.clientSecret" = data.sops_file.argocd.data["oidcAuthentikClientSecret"]
+          }
         }
       },
       controller = {
@@ -92,6 +120,9 @@ resource "helm_release" "argocd" {
             }
           }
         }
+      },
+      dex = {
+        enabled = true
       },
     })
   ]

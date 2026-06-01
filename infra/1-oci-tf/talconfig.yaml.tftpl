@@ -109,9 +109,10 @@ nodes:
       - |-
         cluster:
           etcd:
-            extraArgs:
-              listen-client-urls: "https://127.0.0.1:2379,https://[::1]:2379,https://${node.private_ipv4}:2379"
-              listen-peer-urls: "https://${node.private_ipv4}:2380"
+            extraArgs: 
+              heartbeat-interval: "500"
+              election-timeout: "5000"
+              listen-metrics-urls: http://[::]:2381
 %{ endif ~}
 %{ endfor ~}
 %{ for name, node in nodes ~}
@@ -129,6 +130,11 @@ nodes:
       - |-
         cluster:
           allowSchedulingOnControlPlanes: true
+          etcd:
+            extraArgs:
+              heartbeat-interval: "500"
+              election-timeout: "5000"
+              listen-metrics-urls: http://[::]:2381
 
 %{ endif ~}
 %{ endfor ~}

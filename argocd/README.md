@@ -31,3 +31,36 @@ Put the Application spec in the lifecycle directory matching what it creates,
 then choose the wave from the dependency it consumes, not from the app name. Keep
 CR-consuming manifests after the Application that installs their CRDs, and keep
 `ExternalSecret` resources after `ClusterSecretStore` is available.
+
+## Security hardening notes
+
+Namespace Pod Security Admission should usually start at `enforce: baseline`
+with `audit` and `warn` set to `restricted`. Move a namespace to restricted
+enforcement only after the audit events are clean. Longhorn, Vault, and the
+observability stack are currently known exceptions because they use host access,
+privileged storage behavior, or locking capabilities.
+
+Argo CD can verify Git source integrity with trusted GPG keys, but image
+signature and SLSA provenance enforcement belongs at admission time. Prefer
+Kyverno `verifyImages` or Sigstore policy-controller for Cosign/SLSA checks,
+starting in audit/warn mode before enforcing.
+
+Docker Hardened Images should be trialed per workload rather than applied
+globally. Distroless/no-shell images are useful, but chart probes, init
+containers, writable paths, expected UIDs, and debug workflows need compatibility
+checks before switching production workloads.
+
+## Authentik SSO
+
+Argo CD is configured to use Authentik through Dex so browser and CLI login both
+work. Create an Authentik OAuth2/OpenID Connect application/provider with client
+ID `argocd`, provider slug `argocd`, strict redirect URI
+`https://argo.j6js.com/api/dex/callback`, and strict redirect URI
+`https://localhost:8085/auth/callback`.
+
+Create Authentik groups named `ArgoCD Admins` and `ArgoCD Viewers`; Argo CD maps
+them to `role:admin` and `role:readonly`.
+
+Store the provider client secret in `infra/.sops/argocd.yaml` as
+`oidcAuthentikClientSecret`. Terraform will put it in `argocd-secret` as
+`dex.authentik.clientSecret` during the Argo CD Helm release.
