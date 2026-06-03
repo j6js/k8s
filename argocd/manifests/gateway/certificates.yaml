@@ -88,16 +88,3 @@ spec:
   issuerRef:
     name: letsencrypt
     kind: ClusterIssuer
----
-apiVersion: cert-manager.io/v1
-kind: Certificate
-metadata:
-  name: wazuh-tls
-  namespace: gateway
-spec:
-  secretName: wazuh-tls
-  dnsNames:
-    - wazuh.j6js.com
-  issuerRef:
-    name: letsencrypt
-    kind: ClusterIssuer

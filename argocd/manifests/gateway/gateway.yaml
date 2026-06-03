@@ -71,19 +71,6 @@ spec:
       allowedRoutes:
         namespaces:
           from: All
-    - name: bitwarden-https
-      protocol: HTTPS
-      port: 443
-      hostname: bw.j6js.com
-      tls:
-        mode: Terminate
-        certificateRefs:
-          - group: ''
-            name: bitwarden-tls
-            kind: Secret 
-      allowedRoutes:
-        namespaces:
-          from: All
     - name: n8n-https
       protocol: HTTPS
       port: 443
@@ -94,19 +81,6 @@ spec:
           - group: ''
             name: n8n-tls
             kind: Secret 
-      allowedRoutes:
-        namespaces:
-          from: All
-    - name: wazuh-https
-      protocol: HTTPS
-      port: 443
-      hostname: wazuh.j6js.com
-      tls:
-        mode: Terminate
-        certificateRefs:
-          - group: ''
-            name: wazuh-tls
-            kind: Secret
       allowedRoutes:
         namespaces:
           from: All
