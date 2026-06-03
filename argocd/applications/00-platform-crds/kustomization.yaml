@@ -3,6 +3,7 @@ kind: Kustomization
 resources:
   - infra-cert-manager.yaml
   - infra-cnpg.yaml
+  - infra-redis.yaml
   - infra-envoy-gateway.yaml
   - infra-external-secrets.yaml
   - infra-longhorn.yaml

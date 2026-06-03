@@ -84,3 +84,16 @@ spec:
       allowedRoutes:
         namespaces:
           from: All
+    - name: n8n-https
+      protocol: HTTPS
+      port: 443
+      hostname: n8n.j6js.com
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - group: ''
+            name: n8n-tls
+            kind: Secret 
+      allowedRoutes:
+        namespaces:
+          from: All

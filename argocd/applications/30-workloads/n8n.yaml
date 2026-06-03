@@ -1,0 +1,66 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: n8n
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "20"
+spec:
+  project: default
+  source:
+    repoURL: ghcr.io/n8n-io/n8n-helm-chart
+    chart: n8n
+    targetRevision: "1.8.0"
+    helm:
+      releaseName: n8n
+      valuesObject:
+        queueMode:
+          enabled: true
+          workerReplicaCount: 1
+        replicaCount: 1
+        strategy:
+          type: Recreate
+        ingress:
+          enabled: false
+        persistence:
+          enabled: true
+          size: 2Gi
+          storageClassName: longhorn
+        secretRefs:
+          existingSecret: n8n-generated
+        database:
+          type: postgresdb
+          useExternal: true
+          host: cnpg-rw.cnpg.svc.cluster.local
+          port: 5432
+          database: n8n
+          schema: public
+          user: n8n
+          passwordSecret:
+            name: n8n-db-secrets
+            key: password
+        redis:
+          enabled: true
+          useExternal: true
+          host: redis-master.redis.svc.cluster.local
+          port: 6379
+          passwordSecret:
+            name: redis-auth
+            key: password
+        config:
+          timezone: UTC
+          extraEnv:
+            - name: N8N_PROXY_HOPS
+              value: "1"
+        webhook:
+          url: https://n8n.j6js.com
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true

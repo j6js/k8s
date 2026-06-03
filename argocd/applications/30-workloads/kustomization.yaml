@@ -4,3 +4,5 @@ resources:
   - apps.yaml
   - authentik-config.yaml
   - authentik.yaml
+  - n8n.yaml
+  - n8n-config.yaml
