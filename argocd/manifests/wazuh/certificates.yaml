@@ -1,0 +1,164 @@
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: wazuh-selfsigned
+  namespace: wazuh
+spec:
+  selfSigned: {}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: wazuh-indexer-ca
+  namespace: wazuh
+spec:
+  isCA: true
+  commonName: root-ca
+  secretName: wazuh-indexer-ca
+  duration: 87600h
+  privateKey:
+    algorithm: RSA
+    size: 2048
+  issuerRef:
+    name: wazuh-selfsigned
+    kind: Issuer
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: wazuh-indexer-ca
+  namespace: wazuh
+spec:
+  ca:
+    secretName: wazuh-indexer-ca
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: wazuh-indexer-node
+  namespace: wazuh
+spec:
+  commonName: indexer
+  secretName: wazuh-indexer-node-cert
+  duration: 87600h
+  privateKey:
+    algorithm: RSA
+    encoding: PKCS8
+    size: 2048
+  subject:
+    countries:
+      - US
+    localities:
+      - California
+    organizations:
+      - Company
+  dnsNames:
+    - indexer
+    - indexer.wazuh
+    - indexer.wazuh.svc
+    - indexer.wazuh.svc.cluster.local
+    - wazuh-indexer
+    - wazuh-indexer.wazuh
+    - wazuh-indexer.wazuh.svc
+    - wazuh-indexer.wazuh.svc.cluster.local
+    - wazuh-indexer-0.wazuh-indexer
+    - wazuh-indexer-0.wazuh-indexer.wazuh
+    - wazuh-indexer-0.wazuh-indexer.wazuh.svc
+    - wazuh-indexer-0.wazuh-indexer.wazuh.svc.cluster.local
+  issuerRef:
+    name: wazuh-indexer-ca
+    kind: Issuer
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: wazuh-indexer-admin
+  namespace: wazuh
+spec:
+  commonName: admin
+  secretName: wazuh-indexer-admin-cert
+  duration: 87600h
+  privateKey:
+    algorithm: RSA
+    encoding: PKCS8
+    size: 2048
+  subject:
+    countries:
+      - US
+    localities:
+      - California
+    organizations:
+      - Company
+  issuerRef:
+    name: wazuh-indexer-ca
+    kind: Issuer
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: wazuh-filebeat
+  namespace: wazuh
+spec:
+  commonName: filebeat
+  secretName: wazuh-filebeat-cert
+  duration: 87600h
+  privateKey:
+    algorithm: RSA
+    encoding: PKCS8
+    size: 2048
+  subject:
+    countries:
+      - US
+    localities:
+      - California
+    organizations:
+      - Company
+  issuerRef:
+    name: wazuh-indexer-ca
+    kind: Issuer
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: wazuh-dashboard-indexer
+  namespace: wazuh
+spec:
+  commonName: dashboard
+  secretName: wazuh-dashboard-indexer-cert
+  duration: 87600h
+  privateKey:
+    algorithm: RSA
+    encoding: PKCS8
+    size: 2048
+  subject:
+    countries:
+      - US
+    localities:
+      - California
+    organizations:
+      - Company
+  issuerRef:
+    name: wazuh-indexer-ca
+    kind: Issuer
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: wazuh-dashboard-http
+  namespace: wazuh
+spec:
+  commonName: wazuh-dashboard
+  secretName: wazuh-dashboard-http-cert
+  duration: 8760h
+  privateKey:
+    algorithm: RSA
+    size: 2048
+  dnsNames:
+    - dashboard
+    - dashboard.wazuh
+    - dashboard.wazuh.svc
+    - dashboard.wazuh.svc.cluster.local
+    - wazuh.j6js.com
+  issuerRef:
+    name: wazuh-indexer-ca
+    kind: Issuer

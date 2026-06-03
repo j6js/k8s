@@ -97,3 +97,16 @@ spec:
       allowedRoutes:
         namespaces:
           from: All
+    - name: wazuh-https
+      protocol: HTTPS
+      port: 443
+      hostname: wazuh.j6js.com
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - group: ''
+            name: wazuh-tls
+            kind: Secret
+      allowedRoutes:
+        namespaces:
+          from: All

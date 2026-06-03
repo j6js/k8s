@@ -153,6 +153,16 @@ module "nlb_${region}" {
       backend_port  = 30443
       protocol      = "TCP"
     }
+    wazuh_agents = {
+      listener_port = 1514
+      backend_port  = 31514
+      protocol      = "TCP"
+    }
+    wazuh_registration = {
+      listener_port = 1515
+      backend_port  = 31515
+      protocol      = "TCP"
+    }
   }
   backends = {
 %{ for name, vm in vms_by_region[region] ~}

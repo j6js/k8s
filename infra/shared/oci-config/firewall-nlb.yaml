@@ -3,7 +3,7 @@ rules:
     description: "Allow health checks and traffic from NLB to backend services"
     direction: ingress
     protocol: tcp
-    ports: [30080, 30443]
+    ports: [30080, 30443, 31514, 31515]
     source: internet
     destination: ""
     for_roles: [cp, sh, wk]
