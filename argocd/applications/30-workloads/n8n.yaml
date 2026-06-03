@@ -26,6 +26,28 @@ spec:
           enabled: true
           size: 2Gi
           storageClassName: longhorn
+        resources:
+          main:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi
+          worker:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi
+          webhookProcessor:
+            requests:
+              cpu: 25m
+              memory: 64Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
         secretRefs:
           existingSecret: n8n-generated
         database:
