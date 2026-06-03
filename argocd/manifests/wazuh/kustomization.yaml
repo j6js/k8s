@@ -67,6 +67,8 @@ patches:
       name: wazuh-indexer
       namespace: wazuh
     patch: |-
+      - op: remove
+        path: /spec/template/spec/initContainers/1
       - op: replace
         path: /spec/template/spec/volumes/0
         value:
