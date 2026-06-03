@@ -10,7 +10,7 @@ spec:
   source:
     repoURL: registry-1.docker.io/bitnamicharts
     chart: redis
-    targetRevision: 20.10.0
+    targetRevision: 27.0.0
     helm:
       releaseName: redis
       valuesObject:
