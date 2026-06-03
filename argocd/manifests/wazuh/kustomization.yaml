@@ -61,6 +61,7 @@ patches:
             port: 80
             targetPort: 5601
   - path: dashboard-deployment.yaml
+  - path: resource-requests.yaml
   - target:
       kind: StatefulSet
       name: wazuh-indexer

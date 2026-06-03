@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wazuh-dashboard
+  namespace: wazuh
+spec:
+  template:
+    spec:
+      containers:
+        - name: wazuh-dashboard
+          resources:
+            requests:
+              cpu: 50m
+              memory: 256Mi
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: wazuh-indexer
+  namespace: wazuh
+spec:
+  template:
+    spec:
+      initContainers:
+        - name: increase-the-vm-max-map-count
+          resources:
+            requests:
+              cpu: 10m
+              memory: 16Mi
+            limits:
+              cpu: 50m
+              memory: 64Mi
+      containers:
+        - name: wazuh-indexer
+          resources:
+            requests:
+              cpu: 100m
+              memory: 1Gi
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: wazuh-manager-master
+  namespace: wazuh
+spec:
+  template:
+    spec:
+      containers:
+        - name: wazuh-manager
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: wazuh-manager-worker
+  namespace: wazuh
+spec:
+  template:
+    spec:
+      containers:
+        - name: wazuh-manager
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
