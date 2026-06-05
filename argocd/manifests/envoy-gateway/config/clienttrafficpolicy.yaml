@@ -9,6 +9,7 @@ spec:
     - group: gateway.networking.k8s.io
       kind: Gateway
       name: public-gateway
+      namespace: gateway
   clientIPDetection:
     xForwardedFor:
       numTrustedHops: 1
