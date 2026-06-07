@@ -81,3 +81,15 @@ spec:
       recordType: CNAME
       targets:
         - hl.j6js.com
+---
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: xray
+  namespace: gateway
+spec:
+  endpoints:
+    - dnsName: xray.j6js.com
+      recordType: CNAME
+      targets:
+        - hl.j6js.com

@@ -13,6 +13,22 @@ locals {
 
   ipv4_listener_keys = var.enable_ipv4_backends ? var.listeners : {}
   ipv6_listener_keys = var.enable_ipv6_backends ? var.listeners : {}
+  listener_protocol_numbers = {
+    for name, listener in var.listeners :
+    name => listener.protocol == "UDP" || listener.protocol == "17" ? "17" : "6"
+  }
+  listener_protocol_names = {
+    for name, listener in var.listeners :
+    name => listener.protocol == "UDP" || listener.protocol == "17" ? "UDP" : "TCP"
+  }
+  listener_health_check_protocol_names = {
+    for name, listener in var.listeners :
+    name => listener.health_check_protocol == null ? local.listener_protocol_names[name] : listener.health_check_protocol
+  }
+  listener_health_check_ports = {
+    for name, listener in var.listeners :
+    name => listener.health_check_port == null ? listener.backend_port : listener.health_check_port
+  }
 
   ipv4_backend_registrations = merge([
     for listener_name, listener in var.listeners : {
@@ -49,22 +65,36 @@ resource "oci_core_network_security_group_security_rule" "nlb_ingress" {
   for_each = {
     for item in setproduct(keys(var.listeners), local.internet_cidrs) :
     "${item[0]}-${replace(item[1], "/", "_")}" => {
-      listener = var.listeners[item[0]]
-      cidr     = item[1]
+      listener_name = item[0]
+      listener      = var.listeners[item[0]]
+      cidr          = item[1]
     }
   }
 
   network_security_group_id = oci_core_network_security_group.nlb.id
   description               = "Allow public ingress to ${each.key}"
   direction                 = "INGRESS"
-  protocol                  = "6"
+  protocol                  = local.listener_protocol_numbers[each.value.listener_name]
   source_type               = "CIDR_BLOCK"
   source                    = each.value.cidr
 
-  tcp_options {
-    destination_port_range {
-      min = each.value.listener.listener_port
-      max = each.value.listener.listener_port
+  dynamic "tcp_options" {
+    for_each = local.listener_protocol_names[each.value.listener_name] == "TCP" ? [1] : []
+    content {
+      destination_port_range {
+        min = each.value.listener.listener_port
+        max = each.value.listener.listener_port
+      }
+    }
+  }
+
+  dynamic "udp_options" {
+    for_each = local.listener_protocol_names[each.value.listener_name] == "UDP" ? [1] : []
+    content {
+      destination_port_range {
+        min = each.value.listener.listener_port
+        max = each.value.listener.listener_port
+      }
     }
   }
 }
@@ -75,14 +105,27 @@ resource "oci_core_network_security_group_security_rule" "nlb_egress_ipv4" {
   network_security_group_id = oci_core_network_security_group.nlb.id
   description               = "Allow NLB egress to ${each.key} backends (IPv4)"
   direction                 = "EGRESS"
-  protocol                  = "6"
+  protocol                  = local.listener_protocol_numbers[each.key]
   destination_type          = "CIDR_BLOCK"
   destination               = data.oci_core_vcn.this.cidr_blocks[0]
 
-  tcp_options {
-    destination_port_range {
-      min = each.value.backend_port
-      max = each.value.backend_port
+  dynamic "tcp_options" {
+    for_each = local.listener_protocol_names[each.key] == "TCP" ? [1] : []
+    content {
+      destination_port_range {
+        min = each.value.backend_port
+        max = each.value.backend_port
+      }
+    }
+  }
+
+  dynamic "udp_options" {
+    for_each = local.listener_protocol_names[each.key] == "UDP" ? [1] : []
+    content {
+      destination_port_range {
+        min = each.value.backend_port
+        max = each.value.backend_port
+      }
     }
   }
 }
@@ -93,14 +136,27 @@ resource "oci_core_network_security_group_security_rule" "nlb_egress_ipv6" {
   network_security_group_id = oci_core_network_security_group.nlb.id
   description               = "Allow NLB egress to ${each.key} backends (IPv6)"
   direction                 = "EGRESS"
-  protocol                  = "6"
+  protocol                  = local.listener_protocol_numbers[each.key]
   destination_type          = "CIDR_BLOCK"
   destination               = data.oci_core_vcn.this.ipv6cidr_blocks[0]
 
-  tcp_options {
-    destination_port_range {
-      min = each.value.backend_port
-      max = each.value.backend_port
+  dynamic "tcp_options" {
+    for_each = local.listener_protocol_names[each.key] == "TCP" ? [1] : []
+    content {
+      destination_port_range {
+        min = each.value.backend_port
+        max = each.value.backend_port
+      }
+    }
+  }
+
+  dynamic "udp_options" {
+    for_each = local.listener_protocol_names[each.key] == "UDP" ? [1] : []
+    content {
+      destination_port_range {
+        min = each.value.backend_port
+        max = each.value.backend_port
+      }
     }
   }
 }
@@ -123,11 +179,9 @@ resource "oci_network_load_balancer_backend_set" "ipv4" {
   is_preserve_source       = true
 
   health_checker {
-    protocol           = "TCP"
-    port               = each.value.backend_port
-    interval_in_millis = 10000
-    timeout_in_millis  = 3000
-    retries            = 3
+    protocol = local.listener_health_check_protocol_names[each.key]
+    port     = local.listener_health_check_ports[each.key]
+    retries  = 3
   }
 }
 
@@ -140,11 +194,9 @@ resource "oci_network_load_balancer_backend_set" "ipv6" {
   is_preserve_source       = true
 
   health_checker {
-    protocol           = "TCP"
-    port               = each.value.backend_port
-    interval_in_millis = 10000
-    timeout_in_millis  = 3000
-    retries            = 3
+    protocol = local.listener_health_check_protocol_names[each.key]
+    port     = local.listener_health_check_ports[each.key]
+    retries  = 3
   }
 }
 
@@ -172,9 +224,8 @@ resource "oci_network_load_balancer_listener" "ipv4" {
   name                     = "${each.key}_ipv4"
   network_load_balancer_id = oci_network_load_balancer_network_load_balancer.ingress.id
   port                     = each.value.listener_port
-  protocol                 = each.value.protocol
+  protocol                 = local.listener_protocol_names[each.key]
   ip_version               = "IPV4"
-  tcp_idle_timeout         = 300
 }
 
 resource "oci_network_load_balancer_listener" "ipv6" {
@@ -183,7 +234,6 @@ resource "oci_network_load_balancer_listener" "ipv6" {
   name                     = "${each.key}_ipv6"
   network_load_balancer_id = oci_network_load_balancer_network_load_balancer.ingress.id
   port                     = each.value.listener_port
-  protocol                 = each.value.protocol
+  protocol                 = local.listener_protocol_names[each.key]
   ip_version               = "IPV6"
-  tcp_idle_timeout         = 300
 }

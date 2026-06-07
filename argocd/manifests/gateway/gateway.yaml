@@ -84,3 +84,15 @@ spec:
       allowedRoutes:
         namespaces:
           from: All
+    - name: xray-tcp
+      protocol: TCP
+      port: 1514
+      allowedRoutes:
+        namespaces:
+          from: All
+    - name: xray-udp
+      protocol: UDP
+      port: 1515
+      allowedRoutes:
+        namespaces:
+          from: All

@@ -70,3 +70,12 @@ rules:
     source: internet
     destination: ""
     for_roles: [cp, sh, wk]
+
+  - name: udp-nodeport
+    description: "UDP NodePort ingress"
+    direction: ingress
+    protocol: udp
+    ports: [30444, 31515]
+    source: internet
+    destination: ""
+    for_roles: [cp, sh, wk]

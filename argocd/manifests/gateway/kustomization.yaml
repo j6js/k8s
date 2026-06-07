@@ -4,4 +4,6 @@ resources:
   - dns-endpoints.yaml
   - certificates.yaml
   - gateway.yaml
+  - clienttrafficpolicy.yaml
   - httproutes.yaml
+  - xray-routes.yaml

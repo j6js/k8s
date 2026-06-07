@@ -1,15 +1,14 @@
 apiVersion: gateway.envoyproxy.io/v1alpha1
 kind: ClientTrafficPolicy
 metadata:
-  name: envoy-gateway-config
-  namespace: envoy-gateway
+  name: public-gateway-client-traffic
+  namespace: gateway
 spec:
   http3: {}
   targetRefs:
     - group: gateway.networking.k8s.io
       kind: Gateway
       name: public-gateway
-      namespace: gateway
   clientIPDetection:
     xForwardedFor:
       numTrustedHops: 1

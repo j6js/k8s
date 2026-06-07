@@ -35,13 +35,32 @@ spec:
         type: NodePort
         externalTrafficPolicy: Local
         patch:
-          type: StrategicMerge
+          type: JSONMerge
           value:
             spec:
               ports:
                 - name: http
+                  protocol: TCP
                   port: 80
+                  targetPort: 10080
                   nodePort: 30080
                 - name: https
+                  protocol: TCP
                   port: 443
+                  targetPort: 10443
                   nodePort: 30443
+                - name: https-quic
+                  protocol: UDP
+                  port: 443
+                  targetPort: 10443
+                  nodePort: 30444
+                - name: xray-tcp
+                  protocol: TCP
+                  port: 1514
+                  targetPort: 11514
+                  nodePort: 31514
+                - name: xray-udp
+                  protocol: UDP
+                  port: 1515
+                  targetPort: 11515
+                  nodePort: 31515

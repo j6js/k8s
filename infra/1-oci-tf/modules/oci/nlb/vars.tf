@@ -38,9 +38,11 @@ variable "backend_roles" {
 variable "listeners" {
   description = "Frontend listeners and Kubernetes NodePort backend ports."
   type = map(object({
-    listener_port = number
-    backend_port  = number
-    protocol      = string
+    listener_port         = number
+    backend_port          = number
+    protocol              = string
+    health_check_port     = optional(number)
+    health_check_protocol = optional(string)
   }))
   default = {
     http = {

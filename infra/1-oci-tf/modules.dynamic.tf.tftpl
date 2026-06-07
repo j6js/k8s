@@ -153,15 +153,24 @@ module "nlb_${region}" {
       backend_port  = 30443
       protocol      = "TCP"
     }
-    wazuh_agents = {
+    https-quic = {
+      listener_port         = 443
+      backend_port          = 30444
+      protocol              = "UDP"
+      health_check_port     = 30443
+      health_check_protocol = "TCP"
+    }
+    xray-tcp = {
       listener_port = 1514
       backend_port  = 31514
       protocol      = "TCP"
     }
-    wazuh_registration = {
-      listener_port = 1515
-      backend_port  = 31515
-      protocol      = "TCP"
+    xray-udp = {
+      listener_port         = 1515
+      backend_port          = 31515
+      protocol              = "UDP"
+      health_check_port     = 31514
+      health_check_protocol = "TCP"
     }
   }
   backends = {
