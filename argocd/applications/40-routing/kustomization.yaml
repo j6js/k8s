@@ -3,3 +3,4 @@ kind: Kustomization
 resources:
   - infra-envoy-gateway-routing.yaml
   - infra-gateway.yaml
+  - tailscale-exit-node.yaml

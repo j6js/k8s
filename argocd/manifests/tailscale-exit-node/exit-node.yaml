@@ -1,0 +1,9 @@
+apiVersion: tailscale.com/v1alpha1
+kind: Connector
+metadata:
+  name: tailscale-exit-node
+  namespace: tailscale
+spec:
+  replicas: 1
+  hostnamePrefix: oci-k8s-exit # name that shows up client side, e.g. "oci-k8s-exit-1"
+  exitNode: true
