@@ -13,7 +13,7 @@ spec:
   rules:
     - backendRefs:
         - name: 3x-ui
-          port: 10000
+          port: 8443
 ---
 apiVersion: gateway.networking.k8s.io/v1alpha2
 kind: UDPRoute
