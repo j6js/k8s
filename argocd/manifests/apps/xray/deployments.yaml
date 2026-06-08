@@ -1,51 +1,6 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: xray
-  namespace: xray
-  labels:
-    app.kubernetes.io/name: xray
-spec:
-  replicas: 1
-  strategy:
-    type: RollingUpdate
-  selector:
-    matchLabels:
-      app.kubernetes.io/name: xray
-  template:
-    metadata:
-      labels:
-        app.kubernetes.io/name: xray
-    spec:
-      containers:
-        - name: xray
-          image: ghcr.io/xtls/xray-core:26.6.1
-          imagePullPolicy: IfNotPresent
-          args:
-            - run
-          ports:
-            - name: proxy-tcp
-              containerPort: 10000
-              protocol: TCP
-            - name: proxy-udp
-              containerPort: 10000
-              protocol: UDP
-          resources:
-            requests:
-              cpu: 50m
-              memory: 64Mi
-            limits:
-              cpu: 500m
-              memory: 512Mi
-          securityContext:
-            allowPrivilegeEscalation: false
-            capabilities:
-              drop:
-                - ALL
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
   name: 3x-ui
   namespace: xray
   labels:
