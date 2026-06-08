@@ -1,0 +1,61 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: xray
+  namespace: xray
+  labels:
+    app.kubernetes.io/name: xray
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: xray
+  ports:
+    - name: proxy-tcp
+      port: 10000
+      targetPort: proxy-tcp
+      protocol: TCP
+    - name: proxy-udp
+      port: 10000
+      targetPort: proxy-udp
+      protocol: UDP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: 3x-ui
+  namespace: xray
+  labels:
+    app.kubernetes.io/name: 3x-ui
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: 3x-ui
+  ports:
+    - name: ui-tcp
+      port: 2053
+      targetPort: ui-tcp
+      protocol: TCP
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: 3x-ui-route
+  namespace: xray
+spec:
+  parentRefs:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: public-gateway
+      namespace: gateway
+      sectionName: xray-https
+  hostnames:
+    - xray.j6js.com
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: 3x-ui
+          port: 2053
+          weight: 1

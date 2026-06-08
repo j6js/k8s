@@ -1,0 +1,108 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: xray
+  namespace: xray
+  labels:
+    app.kubernetes.io/name: xray
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: xray
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: xray
+    spec:
+      containers:
+        - name: xray
+          image: ghcr.io/xtls/xray-core:26.6.1
+          imagePullPolicy: IfNotPresent
+          args:
+            - run
+            - -config
+            - /usr/local/etc/xray/config.json
+          ports:
+            - name: proxy-tcp
+              containerPort: 10000
+              protocol: TCP
+            - name: proxy-udp
+              containerPort: 10000
+              protocol: UDP
+          volumeMounts:
+            - name: config
+              mountPath: /usr/local/etc/xray/config.json
+              subPath: config.json
+              readOnly: true
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+      volumes:
+        - name: config
+          secret:
+            secretName: xray-config
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: 3x-ui
+  namespace: xray
+  labels:
+    app.kubernetes.io/name: 3x-ui
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: 3x-ui
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: 3x-ui
+    spec:
+      containers:
+        - name: 3x-ui
+          image: ghcr.io/mhsanaei/3x-ui:v3.2.8
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: XUI_DB_TYPE
+              value: "postgres"
+            - name: XUI_DB_DSN
+              valueFrom:
+                secretKeyRef:
+                  name: 3x-ui-db
+                  key: XUI_DB_DSN
+            - name: XUI_LOG_LEVEL
+              value: "info"
+          ports:
+            - name: ui-tcp
+              containerPort: 2053
+              protocol: TCP
+            - name: ui-udp
+              containerPort: 2053
+              protocol: UDP
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL

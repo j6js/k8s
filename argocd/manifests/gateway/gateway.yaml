@@ -84,15 +84,32 @@ spec:
       allowedRoutes:
         namespaces:
           from: All
+    - name: xray-https
+      protocol: HTTPS
+      port: 443
+      hostname: xray.j6js.com
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - group: ''
+            name: xray-tls
+            kind: Secret
+      allowedRoutes:
+        namespaces:
+          from: All
     - name: xray-tcp
       protocol: TCP
       port: 1514
       allowedRoutes:
+        kinds:
+          - kind: TCPRoute
         namespaces:
           from: All
     - name: xray-udp
       protocol: UDP
       port: 1515
       allowedRoutes:
+        kinds:
+          - kind: UDPRoute
         namespaces:
           from: All

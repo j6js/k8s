@@ -40,3 +40,10 @@ spec:
         login: true
         passwordSecret:
           name: cnpg-n8n
+      - name: 3x-ui
+        connectionLimit: -1
+        ensure: present
+        inherit: true
+        login: true
+        passwordSecret:
+          name: cnpg-3x-ui

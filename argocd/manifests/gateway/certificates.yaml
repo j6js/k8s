@@ -88,3 +88,16 @@ spec:
   issuerRef:
     name: letsencrypt
     kind: ClusterIssuer
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: xray-tls
+  namespace: gateway
+spec:
+  secretName: xray-tls
+  dnsNames:
+    - xray.j6js.com
+  issuerRef:
+    name: letsencrypt
+    kind: ClusterIssuer

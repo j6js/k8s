@@ -1,0 +1,10 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: 3x-ui
+  namespace: cnpg
+spec:
+  name: 3x-ui
+  owner: 3x-ui
+  cluster:
+    name: cnpg
