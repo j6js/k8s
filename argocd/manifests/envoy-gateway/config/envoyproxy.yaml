@@ -56,11 +56,11 @@ spec:
                   nodePort: 30444
                 - name: xray-tcp
                   protocol: TCP
-                  port: 1514
-                  targetPort: 11514
-                  nodePort: 31514
+                  port: 8443
+                  targetPort: 8443
+                  nodePort: 38443
                 - name: xray-udp
                   protocol: UDP
-                  port: 1515
-                  targetPort: 11515
-                  nodePort: 31515
+                  port: 8443
+                  targetPort: 8443
+                  nodePort: 38443
