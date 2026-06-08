@@ -23,8 +23,6 @@ spec:
           imagePullPolicy: IfNotPresent
           args:
             - run
-            - -config
-            - /usr/local/etc/xray/config.json
           ports:
             - name: proxy-tcp
               containerPort: 10000
@@ -32,11 +30,6 @@ spec:
             - name: proxy-udp
               containerPort: 10000
               protocol: UDP
-          volumeMounts:
-            - name: config
-              mountPath: /usr/local/etc/xray/config.json
-              subPath: config.json
-              readOnly: true
           resources:
             requests:
               cpu: 50m
@@ -49,10 +42,6 @@ spec:
             capabilities:
               drop:
                 - ALL
-      volumes:
-        - name: config
-          secret:
-            secretName: xray-config
 ---
 apiVersion: apps/v1
 kind: Deployment
