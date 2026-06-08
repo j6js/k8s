@@ -58,9 +58,9 @@ spec:
                   protocol: TCP
                   port: 8443
                   targetPort: 8443
-                  nodePort: 38443
+                  nodePort: 31443
                 - name: xray-udp
                   protocol: UDP
                   port: 8443
                   targetPort: 8443
-                  nodePort: 38443
+                  nodePort: 31443

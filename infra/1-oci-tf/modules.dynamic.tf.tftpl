@@ -161,15 +161,15 @@ module "nlb_${region}" {
       health_check_protocol = "TCP"
     }
     xray-tcp = {
-      listener_port = 1514
-      backend_port  = 31514
+      listener_port = 8443
+      backend_port  = 31443
       protocol      = "TCP"
     }
     xray-udp = {
-      listener_port         = 1515
-      backend_port          = 31515
+      listener_port         = 8443
+      backend_port          = 31443
       protocol              = "UDP"
-      health_check_port     = 31514
+      health_check_port     = 31443
       health_check_protocol = "TCP"
     }
   }
