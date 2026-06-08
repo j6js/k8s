@@ -6,4 +6,3 @@ resources:
   - authentik.yaml
   - n8n.yaml
   - n8n-config.yaml
-  - tailscale-operator.yaml
