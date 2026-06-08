@@ -99,7 +99,7 @@ spec:
           from: All
     - name: xray-tcp
       protocol: TCP
-      port: 1514
+      port: 8443
       allowedRoutes:
         kinds:
           - kind: TCPRoute
@@ -107,7 +107,7 @@ spec:
           from: All
     - name: xray-udp
       protocol: UDP
-      port: 1515
+      port: 8443
       allowedRoutes:
         kinds:
           - kind: UDPRoute

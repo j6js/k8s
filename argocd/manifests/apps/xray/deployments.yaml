@@ -83,6 +83,12 @@ spec:
             - name: ui-udp
               containerPort: 2053
               protocol: UDP
+            - name: proxy-tcp
+              containerPort: 8443
+              protocol: TCP
+            - name: proxy-udp
+              containerPort: 8443
+              protocol: UDP
           resources:
             requests:
               cpu: 50m

@@ -1,27 +1,6 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: xray
-  namespace: xray
-  labels:
-    app.kubernetes.io/name: xray
-spec:
-  type: ClusterIP
-  selector:
-    app.kubernetes.io/name: xray
-  ports:
-    - name: proxy-tcp
-      port: 10000
-      targetPort: proxy-tcp
-      protocol: TCP
-    - name: proxy-udp
-      port: 10000
-      targetPort: proxy-udp
-      protocol: UDP
----
-apiVersion: v1
-kind: Service
-metadata:
   name: 3x-ui
   namespace: xray
   labels:
@@ -35,6 +14,14 @@ spec:
       port: 2053
       targetPort: ui-tcp
       protocol: TCP
+    - name: proxy-tcp
+      port: 8443
+      targetPort: proxy-tcp
+      protocol: TCP
+    - name: proxy-udp
+      port: 8443
+      targetPort: proxy-udp
+      protocol: UDP
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
