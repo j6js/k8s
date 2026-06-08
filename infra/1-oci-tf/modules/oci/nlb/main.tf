@@ -79,7 +79,7 @@ resource "oci_core_network_security_group_security_rule" "nlb_ingress" {
   source                    = each.value.cidr
 
   dynamic "tcp_options" {
-    for_each = local.listener_protocol_names[each.value.listener_name] == "TCP" ? [1] : []
+    for_each = strcontains(local.listener_protocol_names[each.value.listener_name], "TCP") ? [1] : []
     content {
       destination_port_range {
         min = each.value.listener.listener_port
@@ -89,7 +89,7 @@ resource "oci_core_network_security_group_security_rule" "nlb_ingress" {
   }
 
   dynamic "udp_options" {
-    for_each = local.listener_protocol_names[each.value.listener_name] == "UDP" ? [1] : []
+    for_each = strcontains(local.listener_protocol_names[each.value.listener_name], "UDP") ? [1] : []
     content {
       destination_port_range {
         min = each.value.listener.listener_port
@@ -110,7 +110,7 @@ resource "oci_core_network_security_group_security_rule" "nlb_egress_ipv4" {
   destination               = data.oci_core_vcn.this.cidr_blocks[0]
 
   dynamic "tcp_options" {
-    for_each = local.listener_protocol_names[each.key] == "TCP" ? [1] : []
+    for_each = strcontains(local.listener_protocol_names[each.key], "TCP") ? [1] : []
     content {
       destination_port_range {
         min = each.value.backend_port
@@ -120,7 +120,7 @@ resource "oci_core_network_security_group_security_rule" "nlb_egress_ipv4" {
   }
 
   dynamic "udp_options" {
-    for_each = local.listener_protocol_names[each.key] == "UDP" ? [1] : []
+    for_each = strcontains(local.listener_protocol_names[each.key], "UDP") ? [1] : []
     content {
       destination_port_range {
         min = each.value.backend_port
@@ -141,7 +141,7 @@ resource "oci_core_network_security_group_security_rule" "nlb_egress_ipv6" {
   destination               = data.oci_core_vcn.this.ipv6cidr_blocks[0]
 
   dynamic "tcp_options" {
-    for_each = local.listener_protocol_names[each.key] == "TCP" ? [1] : []
+    for_each = strcontains(local.listener_protocol_names[each.key], "TCP") ? [1] : []
     content {
       destination_port_range {
         min = each.value.backend_port
@@ -151,7 +151,7 @@ resource "oci_core_network_security_group_security_rule" "nlb_egress_ipv6" {
   }
 
   dynamic "udp_options" {
-    for_each = local.listener_protocol_names[each.key] == "UDP" ? [1] : []
+    for_each = strcontains(local.listener_protocol_names[each.key], "UDP") ? [1] : []
     content {
       destination_port_range {
         min = each.value.backend_port
@@ -179,7 +179,7 @@ resource "oci_network_load_balancer_backend_set" "ipv4" {
   is_preserve_source       = true
 
   health_checker {
-    protocol = local.listener_health_check_protocol_names[each.key]
+    protocol = "TCP" # would be a mess if we used UDP.
     port     = local.listener_health_check_ports[each.key]
     retries  = 3
   }
@@ -194,7 +194,7 @@ resource "oci_network_load_balancer_backend_set" "ipv6" {
   is_preserve_source       = true
 
   health_checker {
-    protocol = local.listener_health_check_protocol_names[each.key]
+    protocol = "TCP" # would be a mess if we used UDP.
     port     = local.listener_health_check_ports[each.key]
     retries  = 3
   }
@@ -206,6 +206,7 @@ resource "oci_network_load_balancer_backend" "ipv4" {
   network_load_balancer_id = oci_network_load_balancer_network_load_balancer.ingress.id
   target_id                = each.value.target_id
   port                     = each.value.port
+  name                     = "${each.value.backend_name}_${each.value.listener_name}_ipv4"
   weight                   = 1
 }
 
@@ -215,6 +216,7 @@ resource "oci_network_load_balancer_backend" "ipv6" {
   network_load_balancer_id = oci_network_load_balancer_network_load_balancer.ingress.id
   target_id                = each.value.target_id
   port                     = each.value.port
+  name                     = "${each.value.backend_name}_${each.value.listener_name}_ipv6"
   weight                   = 1
 }
 
@@ -224,7 +226,7 @@ resource "oci_network_load_balancer_listener" "ipv4" {
   name                     = "${each.key}_ipv4"
   network_load_balancer_id = oci_network_load_balancer_network_load_balancer.ingress.id
   port                     = each.value.listener_port
-  protocol                 = local.listener_protocol_names[each.key]
+  protocol                 = each.value.protocol
   ip_version               = "IPV4"
 }
 
@@ -234,6 +236,6 @@ resource "oci_network_load_balancer_listener" "ipv6" {
   name                     = "${each.key}_ipv6"
   network_load_balancer_id = oci_network_load_balancer_network_load_balancer.ingress.id
   port                     = each.value.listener_port
-  protocol                 = local.listener_protocol_names[each.key]
+  protocol                 = each.value.protocol
   ip_version               = "IPV6"
 }

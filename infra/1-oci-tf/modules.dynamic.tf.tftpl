@@ -151,26 +151,12 @@ module "nlb_${region}" {
     https = {
       listener_port = 443
       backend_port  = 30443
-      protocol      = "TCP"
+      protocol      = "TCP_AND_UDP"
     }
-    https-quic = {
-      listener_port         = 443
-      backend_port          = 30444
-      protocol              = "UDP"
-      health_check_port     = 30443
-      health_check_protocol = "TCP"
-    }
-    xray-tcp = {
+    xray = {
       listener_port = 8443
       backend_port  = 31443
-      protocol      = "TCP"
-    }
-    xray-udp = {
-      listener_port         = 8443
-      backend_port          = 31443
-      protocol              = "UDP"
-      health_check_port     = 31443
-      health_check_protocol = "TCP"
+      protocol      = "TCP_AND_UDP"
     }
   }
   backends = {
